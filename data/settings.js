@@ -69,7 +69,6 @@ document.documentElement.addEventListener('gm.showPanel', function(event) {
 	var elem = event.detail.element;
 
 	if(elem === undefined) {
-		$(document.body).text('(Google Music Scrobbler) undefined panel: ' + JSON.stringify(event.detail));
 		return;
 	}
 
