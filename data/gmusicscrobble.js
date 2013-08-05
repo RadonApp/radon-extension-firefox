@@ -1,5 +1,6 @@
 var port = self.port,
 	current = null,
+    playing = false,
 	currentTimestamp = null,
 	currentSubmitted = false;
 
@@ -153,12 +154,31 @@ document.documentElement.addEventListener('gm.playSong', function(event) {
 		console.log('    albumArtist: ' + current.albumArtist);
 		console.log('    track: ' + current.track);
 		console.log('    durationMillis: ' + current.durationMillis);
+
+        setPlayingState(true);
 	}
 });
 
 document.documentElement.addEventListener('gm.songUnPaused', function(event) {
 	lastfm.track.updateNowPlaying();
 });
+
+ document.documentElement.addEventListener('gm.playPause', function(event) {
+     setPlayingState();
+ });
+
+function setPlayingState(value) {
+    if(value === undefined) {
+        value = !playing;
+    }
+    playing = value;
+
+    if(playing == true) {
+        $('#slider').attrmonitor('start');
+    } else if(playing == false) {
+        $('#slider').attrmonitor('stop');
+    }
+}
 
 function sliderPositionChanged(min, max, now) {
 	if(current === null || currentSubmitted) {
@@ -184,27 +204,36 @@ function sliderPositionChanged(min, max, now) {
 //
 
 function loaded() {
+    console.log('loaded');
+
 	var sliderMin = null,
 		sliderMax = null;
 
-	$('#slider').attrchange({
-		callback: function(event) {
-			if(event.attributeName == 'aria-valuenow') {
-				sliderPositionChanged(sliderMin, sliderMax, event.newValue);
-			} else if(event.attributeName == 'aria-valuemin') {
-				sliderMin = event.newValue;
-			} else if(event.attributeName == 'aria-valuemax') {
-				sliderMax = event.newValue;
+	$('#slider').attrmonitor({
+        attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
+        interval: 1000,
+        start: false,
+        callback: function(event) {
+			if(event.attribute == 'aria-valuenow') {
+				sliderPositionChanged(sliderMin, sliderMax, event.value);
+			} else if(event.attribute == 'aria-valuemin') {
+				sliderMin = event.value;
+			} else if(event.attribute == 'aria-valuemax') {
+				sliderMax = event.value;
 			}
 		}
 	});
 }
 
-$('#loading-progress').attrchange({
-	callback: function(event) {
-		if(event.attributeName == 'style' &&
-			event.newValue.replace(' ', '').indexOf('display:none;') !== -1) {
+$('#loading-progress').attrmonitor({
+    attributes: ['style'],
+    callback: function(event) {
+		if(event.attribute == 'style' &&
+           event.value !== null &&
+		   event.value.replace(' ', '').indexOf('display:none;') !== -1)
+        {
 			loaded();
+            $('#loading-progress').attrmonitor('destroy');
 		}
 	}
 });
