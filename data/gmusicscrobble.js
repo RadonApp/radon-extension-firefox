@@ -1,8 +1,17 @@
+$ = jQuery;
+
 var port = self.port,
+    data = null,
+    setup = {
+        parent: null,
+        dependant_scripts: null
+    },
 	current = null,
     playing = false,
 	currentTimestamp = null,
 	currentSubmitted = false;
+
+const RE_LEX_ANCHOR = /var\s(\w)=\{eventName:.*?,eventSrc:.*?,payload:.*?\},\w=.*?;/i;
 
 //
 // last.fm API handler
@@ -140,11 +149,24 @@ var lastfm = {
 // Player event handlers
 //
 
+function unpack_song(song) {
+    song = song.a;
+
+    return {
+        title: song[1],
+        album: song[4],
+        artist: song[3],
+        albumArtist: song[3], // TODO fix this
+        track: song[14],
+        durationMillis: song[13]
+    }
+}
+
 document.documentElement.addEventListener('gm.playSong', function(event) {
 	console.log('gm.playSong');
 
 	if(event.detail !== null && event.detail.song !== undefined) {
-		current = event.detail.song;
+		current = unpack_song(event.detail.song);
 		currentTimestamp = Math.round(new Date().getTime() / 1000);
 		currentSubmitted = false;
 
@@ -163,7 +185,7 @@ document.documentElement.addEventListener('gm.songUnPaused', function(event) {
 	lastfm.track.updateNowPlaying();
 });
 
- document.documentElement.addEventListener('gm.playPause', function(event) {
+document.documentElement.addEventListener('gm.playPause', function(event) {
      setPlayingState();
  });
 
@@ -238,9 +260,72 @@ $('#loading-progress').attrmonitor({
 	}
 });
 
+function insert_lex_hook(lex_data) {
+    var match = RE_LEX_ANCHOR.exec(lex_data);
+    var slice_start = match.index + match[0].length;
+
+    var head = lex_data.slice(0, slice_start);
+    var tail = lex_data.slice(slice_start, lex_data.length);
+
+    return head + "if(window.gms_event !== undefined){window.gms_event(" + match[1] + ");}" + tail;
+}
+
+function create_lex(lex_data) {
+    var node = document.createElement("script");
+    node.type = "text/javascript";
+    node.text = insert_lex_hook(lex_data);
+
+    return node;
+}
+
+function setup_client() {
+    console.log("Using \"" + data.lex_location + "\" url for listen_extended");
+
+    var lex_node = $('script[blocked=true]')[0];
+    setup.parent = lex_node.parentNode;
+
+    // Pull out all the following dependant script nodes
+    setup.dependant_scripts = [];
+
+    var cur = lex_node.nextSibling;
+    while(cur != null) {
+        if(cur.tagName == 'SCRIPT') {
+            setup.dependant_scripts.push(cur);
+            setup.parent.removeChild(cur);
+        }
+        cur = cur.nextSibling;
+    }
+    console.log('pulled out ' + setup.dependant_scripts.length + ' dependant script nodes');
+
+    // Remove lex node from the document
+    setup.parent.removeChild(lex_node);
+
+    // Request lex script, then rebuild the client
+    console.log('Requesting lex...');
+
+    self.port.emit('gms.lex_request', {
+        url: data.lex_location
+    });
+}
+
+function rebuild_client(lex_data) {
+    console.log('Rebuilding client...');
+
+    // Re-insert new lex and dependant scripts into the document
+    setup.parent.appendChild(create_lex(lex_data));
+
+    for(var i = 0; i < setup.dependant_scripts.length; i++) {
+        setup.parent.appendChild(setup.dependant_scripts[i]);
+    }
+
+    console.log('Client rebuilt, finished.')
+}
+
+self.port.on('gms.lex_response', rebuild_client);
+
 // Addon (main.js) events
-self.port.on('gms.construct', function(data) {
-	$('body').append('<script type="text/javascript" src="' + data.pageUrl + '"></script>');
+self.port.on('gms.construct', function(_data) {
+    data = _data;
 
 	// Load Settings
 	var storage = data.storage;
@@ -251,6 +336,12 @@ self.port.on('gms.construct', function(data) {
 		   	lastfm.session = storage.lastfm.session;
 		}
 	}
+
+    // Setup the client
+    setup_client();
+
+    // INSERT page.js
+    $('body').append('<script type="text/javascript" src="' + data.pageUrl + '"></script>');
 });
 
 // We are now ready

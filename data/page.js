@@ -4,17 +4,16 @@ function dispatchEvent(type, detail) {
     document.documentElement.dispatchEvent(event);
 }
 
-function dispatchGMEvent(ev) {
-	dispatchEvent('gm.' + ev.eventName, ev.payload);
-}
+var capture_events = [
+    'playSong',
+    'playPause',
+    'songUnPaused',
+    'navigate',
+    'showPanel'
+];
 
-if(window.SJBaddListener !== undefined) {
-	// Bind Events
-	window.SJBaddListener('playSong', dispatchGMEvent);
-	window.SJBaddListener('playPause', dispatchGMEvent);
-	window.SJBaddListener('songUnPaused', dispatchGMEvent);
-	window.SJBaddListener('navigate', dispatchGMEvent);
-	window.SJBaddListener('showPanel', dispatchGMEvent);
-} else {
-	console.error('window.SJBaddListener method not available');
-}
+window.gms_event = function(event) {
+    if(capture_events.indexOf(event.eventName) > -1) {
+        dispatchEvent('gm.' + event.eventName, event.payload);
+    }
+};

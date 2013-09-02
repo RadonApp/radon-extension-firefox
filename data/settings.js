@@ -21,7 +21,7 @@ function initialize(elem) {
 
 
 	var $authorizationLink = $('a#authorization', $settings),
-		$authorizationStatus = $('.lastfm-username .settings-value'),
+		$authorizationStatus = $('.lastfm-username .settings-value', $settings),
 		currentToken = null;
 
 	// Update element state if we have an existing session
