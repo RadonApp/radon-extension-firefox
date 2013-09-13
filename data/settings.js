@@ -10,15 +10,16 @@ var GMS_Settings = {
     ),
     $options: $(
         '<div class="settings-section-content">' +
-            '<div class="lastfm-action-section" style="margin: 12px 0px;">' +
+            '<div class="lastfm-action-section" style="display: inline-block;border-bottom-right-radius: 2px;border-top-right-radius: 2px;">' +
                 '<button id="authorization" class="button" data-state="link">Link Account</button>' +
-                '<span id="authorization-status" style="margin-left: 10px;font-style: italic;color: rgb(170, 170, 170);"></span>' +
+                '<span id="authorization-status" style="margin: 0 10px 0 5px;font-style: italic;color: rgb(170, 170, 170);"></span>' +
             '</div>' +
         '</div>'
     ),
 
     $_myDevice: null,
 
+    $actionSection: null,
     $authorizationButton: null,
     $authorizationStatus: null,
 
@@ -29,6 +30,7 @@ var GMS_Settings = {
         this.$header.insertBefore(this.$_myDevice);
         this.$options.insertAfter(this.$header);
 
+        this.$actionSection = $('.lastfm-action-section', this.$options);
         this.$authorizationButton = $('button#authorization', this.$options);
         this.$authorizationStatus = $('span#authorization-status', this.$options);
 
@@ -45,14 +47,17 @@ var GMS_Settings = {
 
         if(state == 'unlink') {
             this.$authorizationStatus.html('Currently linked with account <b>' + lastfm.session.name + '</b>');
+            this.$actionSection.css('background-color', '');
         } else if(state == 'link') {
             if(error !== undefined) {
                 this.$authorizationStatus.html(error);
             } else {
                 this.$authorizationStatus.html('');
             }
+            this.$actionSection.css('background-color', '');
         } else if(state == 'confirm') {
             this.$authorizationStatus.html('Linking <b>not finished yet</b>, Please confirm authorization.');
+            this.$actionSection.css('background-color', '#FAFA78');
         }
 
         if(state == 'unlink') {
