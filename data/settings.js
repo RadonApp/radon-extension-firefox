@@ -39,7 +39,7 @@ var GMS_Settings = {
             this.setState('unlink');
         }
 
-        this.$authorizationButton.click(this._authorizationClick);
+        this.$authorizationButton.unbind('click').bind('click', this._authorizationClick);
     },
 
     setStatus: function(status, backgroundColor, textColor, disabled) {
@@ -65,7 +65,7 @@ var GMS_Settings = {
             this.setStatus('Currently linked with account <b>' + lastfm.session.name + '</b>');
         } else if(state == 'link') {
             if(error !== undefined) {
-                this.setStatus(error, '#FF9696', '#E8E8E8');
+                this.setStatus(error, '#E86B6B', '#E8E8E8');
             } else {
                 this.setStatus('');
             }
@@ -115,6 +115,11 @@ var GMS_Settings = {
         // Reset stored lastfm session and update UI
         lastfm.session = null;
         lastfm.saveSession();
+
+        // Reset setup reminder
+        self.port.emit('gms.store', {
+            setup_remind: true
+        });
 
         GMS_Settings.setState('link');
     },

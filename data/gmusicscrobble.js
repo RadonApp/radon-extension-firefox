@@ -90,7 +90,7 @@ var lastfm = {
 				album: current.album,
 				trackNumber: current.track,
 				duration: current.durationMillis / 1000
-			}
+			};
 
 			// Add albumArtist if it differs from artist
 			if(current.artist != current.albumArtist) {
