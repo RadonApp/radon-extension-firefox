@@ -12,7 +12,7 @@ var GMS_Settings = {
         '<div class="settings-section-content">' +
             '<div class="lastfm-action-section" style="display: inline-block;border-bottom-right-radius: 2px;border-top-right-radius: 2px;">' +
                 '<button id="authorization" class="button" data-state="link">Link Account</button>' +
-                '<span id="authorization-status" style="margin: 0 10px 0 5px;font-style: italic;color: rgb(170, 170, 170);"></span>' +
+                '<span id="authorization-status" style="margin: 0 10px 0 5px;font-style: italic;color: #AAAAAA;"></span>' +
             '</div>' +
         '</div>'
     ),
@@ -42,22 +42,35 @@ var GMS_Settings = {
         this.$authorizationButton.click(this._authorizationClick);
     },
 
+    setStatus: function(status, backgroundColor, textColor, disabled) {
+        backgroundColor = backgroundColor !== undefined ? backgroundColor : '';
+        textColor = textColor !== undefined ? textColor : '#AAAAAA';
+        disabled = disabled !== undefined ? disabled : false;
+
+        this.$authorizationStatus.html(status);
+        this.$authorizationStatus.css('color', textColor);
+        this.$actionSection.css('background-color', backgroundColor);
+
+        if(disabled) {
+            this.$authorizationButton.attr('disabled', 'disabled');
+        } else {
+            this.$authorizationButton.removeAttr('disabled');
+        }
+    },
+
     setState: function(state, error) {
         this.$authorizationButton.attr('data-state', state);
 
         if(state == 'unlink') {
-            this.$authorizationStatus.html('Currently linked with account <b>' + lastfm.session.name + '</b>');
-            this.$actionSection.css('background-color', '');
+            this.setStatus('Currently linked with account <b>' + lastfm.session.name + '</b>');
         } else if(state == 'link') {
             if(error !== undefined) {
-                this.$authorizationStatus.html(error);
+                this.setStatus(error, '#FF9696', '#E8E8E8');
             } else {
-                this.$authorizationStatus.html('');
+                this.setStatus('');
             }
-            this.$actionSection.css('background-color', '');
         } else if(state == 'confirm') {
-            this.$authorizationStatus.html('Linking <b>not finished yet</b>, Please confirm authorization.');
-            this.$actionSection.css('background-color', '#FAFA78');
+            this.setStatus('Linking <b>not finished yet</b>, Please confirm authorization.', '#FFF196', '#AAAAAA');
         }
 
         if(state == 'unlink') {
@@ -107,12 +120,14 @@ var GMS_Settings = {
     },
 
     _confirm: function() {
+        this.setStatus('Checking authorization status...', undefined, undefined, true);
+
         // Validate session with last.fm and update UI with result
         lastfm.auth.getSession(GMS_Settings.currentToken, function(result) {
             if(result.error === undefined) {
                 GMS_Settings.setState('unlink');
             } else {
-                GMS_Settings.setState('link', 'link error "' + result.message + '" (' + result.error + ')');
+                GMS_Settings.setState('link', 'Link error "' + result.message + '" (' + result.error + ')');
             }
         });
     }
