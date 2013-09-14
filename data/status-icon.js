@@ -58,23 +58,22 @@ var GMS_StatusIcon = {
         });
     },
 
-    hide: function() {
-        $('.qtip').qtip('hide');
+    destroy: function() {
+        $('.qtip').qtip('destroy');
     },
 
     _setup: function() {
         location.hash = '#/settings';
-
-        GMS_StatusIcon.hide();
+        GMS_StatusIcon.destroy();
     },
     _remind: function() {
-        GMS_StatusIcon.hide();
+        GMS_StatusIcon.destroy();
     },
     _stop: function() {
         self.port.emit('gms.store', {
             setup_remind: false
         });
-        GMS_StatusIcon.hide();
+        GMS_StatusIcon.destroy();
     }
 };
 
