@@ -143,7 +143,7 @@ var lastfm = {
 			});
 		}
 	}
-}
+};
 
 //
 // Player event handlers
@@ -181,10 +181,6 @@ document.documentElement.addEventListener('gm.playSong', function(event) {
 	}
 });
 
-document.documentElement.addEventListener('gm.songUnPaused', function(event) {
-	lastfm.track.updateNowPlaying();
-});
-
 document.documentElement.addEventListener('gm.playPause', function(event) {
      setPlayingState();
  });
@@ -197,6 +193,7 @@ function setPlayingState(value) {
 
     if(playing == true) {
         $('#slider').attrmonitor('start');
+        lastfm.track.updateNowPlaying();
     } else if(playing == false) {
         $('#slider').attrmonitor('stop');
     }
