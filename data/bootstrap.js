@@ -1,2 +1,2 @@
 // We are now ready
-port.emit('gms.ready');
+self.port.emit('gms.ready');

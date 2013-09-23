@@ -1,11 +1,5 @@
 $ = jQuery;
 
-var port = self.port,
-    data = null,
-    storage = null;
-
-const RE_LEX_ANCHOR = /var\s(\w)=\{eventName:.*?,eventSrc:.*?,payload:.*?\},\w=.*?;/i;
-
 var EventHelper = (function() {
     function getPrefix(obj) {
         if(obj.eventPrefix === null) {
@@ -126,6 +120,8 @@ GMS.SliderMonitor = (function() {
 })();
 
 GMS.HookManager = (function(port) {
+    const RE_LEX_ANCHOR = /var\s(\w)=\{eventName:.*?,eventSrc:.*?,payload:.*?\},\w=.*?;/i;
+
     var parent = null,
         dependant_scripts = null;
 
@@ -278,9 +274,8 @@ GMS.Scrobbler = (function() {
 })();
 
 // Addon (main.js) events
-port.on('gms.construct', function(_data) {
-    data = _data;
-    storage = data.storage;
+self.port.on('gms.construct', function(data) {
+    var storage = data.storage;
 
     if(storage !== undefined) {
         // Load stored lastfm session
