@@ -226,13 +226,13 @@ GMS.Scrobbler = (function(lastfm) {
 
         if(playing == true) {
             $('#slider').attrmonitor('start');
-            lastfm.track.updateNowPlaying();
+            lastfm.track.updateNowPlaying(current);
         } else if(playing == false) {
             $('#slider').attrmonitor('stop');
         }
     }
 
-    GMS.SliderMonitor.bind('positionChange', function(min, max, now) {
+    GMS.SliderMonitor.bind('positionChange', function(event, min, max, now) {
         if(current === null || currentSubmitted) {
             return;
         }
@@ -246,7 +246,7 @@ GMS.Scrobbler = (function(lastfm) {
 
         // If over 50% played, submit it
         if(perc >= .50) {
-            lastfm.track.scrobble();
+            lastfm.track.scrobble(current, currentTimestamp);
             currentSubmitted = true;
         }
     });

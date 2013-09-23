@@ -56,43 +56,43 @@ var lastfm = {
     },
 
     track: {
-        updateNowPlaying: function() {
-            if(lastfm.session === null || current === null) {
+        updateNowPlaying: function(track) {
+            if(lastfm.session === null || track === null) {
                 return;
             }
 
-            params = {
+            var params = {
                 sk: lastfm.session.key,
-                track: current.title,
-                artist: current.artist,
-                album: current.album,
-                trackNumber: current.track,
-                duration: current.durationMillis / 1000
+                track: track.title,
+                artist: track.artist,
+                album: track.album,
+                trackNumber: track.track,
+                duration: track.durationMillis / 1000
             };
 
             // Add albumArtist if it differs from artist
-            if(current.artist != current.albumArtist) {
-                params.albumArtist = current.albumArtist;
+            if(track.artist != track.albumArtist) {
+                params.albumArtist = track.albumArtist;
             }
 
             lastfm.call('track.updateNowPlaying', function(result) {
                 // TODO check result
             }, params);
         },
-        scrobble: function() {
-            if(lastfm.session === null || current === null) {
+        scrobble: function(track, timestamp) {
+            if(lastfm.session === null || track === null) {
                 return;
             }
 
-            params = {
+            var params = {
                 sk: lastfm.session.key,
-                track: current.title,
-                artist: current.artist,
-                album: current.album,
-                trackNumber: current.track,
-                duration: current.durationMillis / 1000,
+                track: track.title,
+                artist: track.artist,
+                album: track.album,
+                trackNumber: track.track,
+                duration: track.durationMillis / 1000,
 
-                timestamp: currentTimestamp
+                timestamp: timestamp
             };
 
             lastfm.call('track.scrobble', function(result) {
