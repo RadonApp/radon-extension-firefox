@@ -1,4 +1,4 @@
-GMS.StatusIcon = (function(port, lastfm) {
+GMS.StatusIcon = (function(lastfm) {
     var data = null,
         $iconContainer = null,
         $setupPopup = null,
@@ -39,7 +39,7 @@ GMS.StatusIcon = (function(port, lastfm) {
         if($(this).hasClass('setup')) {
             location.hash = '#/settings';
         } else if($(this).hasClass('stop')) {
-            port.emit('gms.store', {
+            GMS.store({
                 setup_remind: false
             });
         }
@@ -92,4 +92,4 @@ GMS.StatusIcon = (function(port, lastfm) {
             $('.qtip').qtip('destroy');
         }
     }
-})(self.port, lastfm);
+})(lastfm);

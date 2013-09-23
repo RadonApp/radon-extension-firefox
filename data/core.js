@@ -44,6 +44,20 @@ var GMS = (function(port) {
     return {
         $object: $(this),
 
+        open: function(url) {
+            port.emit('gms.open', url);
+        },
+        store: function(data) {
+            port.emit('gms.store', data);
+        },
+        storeSession: function() {
+            GMS.store({
+                lastfm: {
+                    session: lastfm.session
+                }
+            });
+        },
+
         bind: function(eventType, eventData, handler) {
             EventHelper.bind(GMS, eventType, eventData, handler);
         }
@@ -267,6 +281,14 @@ GMS.Scrobbler = (function(lastfm) {
 port.on('gms.construct', function(_data) {
     data = _data;
     storage = data.storage;
+
+    if(storage !== undefined) {
+        // Load stored lastfm session
+        if(storage.lastfm !== undefined &&
+           storage.lastfm.session !== undefined) {
+            lastfm.session = storage.lastfm.session;
+        }
+    }
 
     // INSERT page.js
     $('body').append('<script type="text/javascript" src="' + data.pageUrl + '"></script>');

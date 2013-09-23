@@ -1,5 +1,3 @@
-var port = self.port;
-
 //
 // last.fm API handler
 //
@@ -55,13 +53,6 @@ var lastfm = {
         });
         sig += lastfm.secret;
         return CryptoJS.MD5(sig).toString(CryptoJS.enc.Hex);
-    },
-    saveSession: function() {
-        port.emit('gms.store', {
-            lastfm: {
-                session: lastfm.session
-            }
-        });
     },
 
     track: {
@@ -119,7 +110,6 @@ var lastfm = {
             lastfm.call('auth.getSession', function(result) {
                 if(result.session !== undefined) {
                     lastfm.session = result.session;
-                    lastfm.saveSession();
                 } else {
                     lastfm.session = null;
                 }
@@ -131,15 +121,3 @@ var lastfm = {
         }
     }
 };
-
-port.on('gms.construct', function(data) {
-    var storage = data.storage;
-
-    if(storage !== undefined) {
-        // Load stored lastfm session
-        if(storage.lastfm !== undefined &&
-           storage.lastfm.session !== undefined) {
-            lastfm.session = storage.lastfm.session;
-        }
-    }
-});

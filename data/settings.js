@@ -75,17 +75,17 @@ GMS.Settings = (function(lastfm) {
             currentToken = token;
             setState('confirm');
 
-            port.emit('gms.open', 'http://www.last.fm/api/auth/?api_key=' + lastfm.apiKey + '&token=' + token);
+            GMS.open('http://www.last.fm/api/auth/?api_key=' + lastfm.apiKey + '&token=' + token);
         });
     }
 
     function unlink() {
         // Reset stored lastfm session and update UI
         lastfm.session = null;
-        lastfm.saveSession();
+        GMS.storeSession();
 
         // Reset setup reminder
-        self.port.emit('gms.store', {
+        GMS.store({
             setup_remind: true
         });
 
@@ -97,6 +97,8 @@ GMS.Settings = (function(lastfm) {
 
         // Validate session with last.fm and update UI with result
         lastfm.auth.getSession(currentToken, function(result) {
+            GMS.storeSession();
+
             if(result.error === undefined) {
                 setState('unlink');
             } else {
