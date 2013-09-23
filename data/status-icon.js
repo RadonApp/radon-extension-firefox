@@ -1,4 +1,4 @@
-GMS.StatusIcon = (function(lastfm) {
+GMS.StatusIcon = (function() {
     var data = null,
         $iconContainer = null,
         $setupPopup = null,
@@ -81,7 +81,7 @@ GMS.StatusIcon = (function(lastfm) {
     });
 
     GMS.LoadingMonitor.bind('loaded', function() {
-        if(lastfm.session === null && remind == true) {
+        if(LFM.session === null && remind == true) {
             show('setup');
         }
     });
@@ -92,4 +92,4 @@ GMS.StatusIcon = (function(lastfm) {
             $('.qtip').qtip('destroy');
         }
     }
-})(lastfm);
+})();

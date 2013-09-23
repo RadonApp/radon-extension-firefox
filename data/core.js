@@ -53,7 +53,7 @@ var GMS = (function(port) {
         storeSession: function() {
             GMS.store({
                 lastfm: {
-                    session: lastfm.session
+                    session: LFM.session
                 }
             });
         },
@@ -199,7 +199,7 @@ GMS.HookManager = (function(port) {
     return {};
 })(self.port);
 
-GMS.Scrobbler = (function(lastfm) {
+GMS.Scrobbler = (function() {
     var current = null,
         playing = false,
         currentTimestamp = null,
@@ -226,7 +226,7 @@ GMS.Scrobbler = (function(lastfm) {
 
         if(playing == true) {
             $('#slider').attrmonitor('start');
-            lastfm.track.updateNowPlaying(current);
+            LFM.track.updateNowPlaying(current);
         } else if(playing == false) {
             $('#slider').attrmonitor('stop');
         }
@@ -246,7 +246,7 @@ GMS.Scrobbler = (function(lastfm) {
 
         // If over 50% played, submit it
         if(perc >= .50) {
-            lastfm.track.scrobble(current, currentTimestamp);
+            LFM.track.scrobble(current, currentTimestamp);
             currentSubmitted = true;
         }
     });
@@ -275,7 +275,7 @@ GMS.Scrobbler = (function(lastfm) {
     });
 
     return {};
-})(lastfm);
+})();
 
 // Addon (main.js) events
 port.on('gms.construct', function(_data) {
@@ -286,7 +286,7 @@ port.on('gms.construct', function(_data) {
         // Load stored lastfm session
         if(storage.lastfm !== undefined &&
            storage.lastfm.session !== undefined) {
-            lastfm.session = storage.lastfm.session;
+            LFM.session = storage.lastfm.session;
         }
     }
 

@@ -2,7 +2,7 @@
 // Google Music Scrobbler - Settings
 //
 
-GMS.Settings = (function(lastfm) {
+GMS.Settings = (function() {
     var $header = $(
         '<div class="settings-section-header settings-lastfm" style="margin-top: 20px;">' +
             '<div class="settings-title">Google Music Scrobbler</div>' +
@@ -44,7 +44,7 @@ GMS.Settings = (function(lastfm) {
         $authorizationButton.attr('data-state', state);
 
         if(state == 'unlink') {
-            setStatus('Currently linked with account <b>' + lastfm.session.name + '</b>');
+            setStatus('Currently linked with account <b>' + LFM.session.name + '</b>');
         } else if(state == 'link') {
             if(error !== undefined) {
                 setStatus(error, '#E86B6B', '#E8E8E8');
@@ -71,17 +71,17 @@ GMS.Settings = (function(lastfm) {
     }
 
     function link() {
-        lastfm.auth.getToken(function(token) {
+        LFM.auth.getToken(function(token) {
             currentToken = token;
             setState('confirm');
 
-            GMS.open('http://www.last.fm/api/auth/?api_key=' + lastfm.apiKey + '&token=' + token);
+            GMS.open('http://www.last.fm/api/auth/?api_key=' + LFM.apiKey + '&token=' + token);
         });
     }
 
     function unlink() {
         // Reset stored lastfm session and update UI
-        lastfm.session = null;
+        LFM.session = null;
         GMS.storeSession();
 
         // Reset setup reminder
@@ -96,7 +96,7 @@ GMS.Settings = (function(lastfm) {
         setStatus('Checking authorization status...', undefined, undefined, true);
 
         // Validate session with last.fm and update UI with result
-        lastfm.auth.getSession(currentToken, function(result) {
+        LFM.auth.getSession(currentToken, function(result) {
             GMS.storeSession();
 
             if(result.error === undefined) {
@@ -131,7 +131,7 @@ GMS.Settings = (function(lastfm) {
         $authorizationStatus = $('span#authorization-status', $options);
 
         // Update element state if we have an existing session
-        if(lastfm.session !== null) {
+        if(LFM.session !== null) {
             setState('unlink');
         }
 
@@ -150,4 +150,4 @@ GMS.Settings = (function(lastfm) {
             construct($(elem));
         }
     });
-})(lastfm);
+})();
