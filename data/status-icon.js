@@ -1,50 +1,27 @@
-var GMS_StatusIcon = {
-    $iconContainer: null,
+GMS.StatusIcon = (function(port, lastfm) {
+    var data = null,
+        $iconContainer = null,
+        $setupPopup = null,
+        remind = true;
 
-    initialize: function() {
-        $('#gbw').prepend(
-            '<div id="gms-icon-container">' +
-                '<img src="' + data.urls.icon24 + '"/>' +
-            '</div>'
-        );
-
-        $('body').append(
-            '<div id="gms-popup-setup">' +
-                "<p>Looks like you haven't finished setting up <b>Google Music Scrobbler</b></p>" +
-                '<div class="actions">' +
-                    '<button class="button small primary setup">Setup now</button>' +
-                    '<button class="button small remind">Remind me later</button>' +
-                    '<button class="button small stop">Stop bothering me</button>' +
-                '</div>' +
-            '</div>'
-        );
-
-        this.$iconContainer = $('#gms-icon-container');
-        this.$setupPopup = $('#gms-popup-setup');
-
-        $('.button.setup', this.$setupPopup).bind('click', GMS_StatusIcon._setup);
-        $('.button.remind', this.$setupPopup).bind('click', GMS_StatusIcon._remind);
-        $('.button.stop', this.$setupPopup).bind('click', GMS_StatusIcon._stop);
-    },
-
-    showTooltip: function(type) {
+    function show(type) {
         var content = null;
         if(type == 'setup') {
-            content = GMS_StatusIcon.$setupPopup;
+            content = $setupPopup;
         }
 
         if(content === null) {
             return;
         }
 
-        GMS_StatusIcon.$iconContainer.qtip({
+        $iconContainer.qtip({
             content: {
                 text: content
             },
             position: {
                 my: 'top right',
                 at: 'bottom middle',
-                target: this.$iconContainer
+                target: $iconContainer
             },
             show: {
                 ready: true
@@ -56,34 +33,63 @@ var GMS_StatusIcon = {
                 width: 480
             }
         });
-    },
-
-    destroy: function() {
-        $('.qtip').qtip('destroy');
-    },
-
-    _setup: function() {
-        location.hash = '#/settings';
-        GMS_StatusIcon.destroy();
-    },
-    _remind: function() {
-        GMS_StatusIcon.destroy();
-    },
-    _stop: function() {
-        self.port.emit('gms.store', {
-            setup_remind: false
-        });
-        GMS_StatusIcon.destroy();
     }
-};
 
-self.port.on('gms.construct', function(data) {
-    var storage = data.storage,
-        setup_remind = storage.setup_remind == true || storage.setup_remind === undefined;
+    function buttonClick(event) {
+        if($(this).hasClass('setup')) {
+            location.hash = '#/settings';
+        } else if($(this).hasClass('stop')) {
+            port.emit('gms.store', {
+                setup_remind: false
+            });
+        }
 
-    GMS_StatusIcon.initialize();
-
-    if(lastfm.session === null && setup_remind) {
-        GMS_StatusIcon.showTooltip('setup');
+        GMS.StatusIcon.destroy();
     }
-});
+
+    function construct() {
+        $('#gbw').prepend(
+            '<div id="gms-icon-container">' +
+                '<img src="' + data.urls.icon24 + '"/>' +
+                '</div>'
+        );
+
+        $('body').append(
+            '<div id="gms-popup-setup">' +
+                "<p>Looks like you haven't finished setting up <b>Google Music Scrobbler</b></p>" +
+                '<div class="actions">' +
+                '<button class="button small primary setup">Setup now</button>' +
+                '<button class="button small remind">Remind me later</button>' +
+                '<button class="button small stop">Stop bothering me</button>' +
+                '</div>' +
+                '</div>'
+        );
+
+        $iconContainer = $('#gms-icon-container');
+        $setupPopup = $('#gms-popup-setup');
+
+        $('.button.setup', $setupPopup).bind('click', buttonClick);
+        $('.button.remind', $setupPopup).bind('click', buttonClick);
+        $('.button.stop', $setupPopup).bind('click', buttonClick);
+    }
+
+    GMS.bind('construct', function(event, _data, storage) {
+        data = _data;
+        remind = storage.setup_remind == true || storage.setup_remind === undefined;
+
+        construct();
+    });
+
+    GMS.LoadingMonitor.bind('loaded', function() {
+        if(lastfm.session === null && remind == true) {
+            show('setup');
+        }
+    });
+
+    return {
+        show: show,
+        destroy: function() {
+            $('.qtip').qtip('destroy');
+        }
+    }
+})(self.port, lastfm);
