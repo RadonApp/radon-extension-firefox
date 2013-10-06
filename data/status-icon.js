@@ -75,13 +75,13 @@ GMS.StatusIcon = (function() {
 
     GMS.bind('construct', function(event, _data, storage) {
         data = _data;
-        remind = storage.setup_remind == true || storage.setup_remind === undefined;
+        remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
         construct();
     });
 
     GMS.LoadingMonitor.bind('loaded', function() {
-        if(LFM.session === null && remind == true) {
+        if(LFM.session === null && remind === true) {
             show('setup');
         }
     });
@@ -91,5 +91,5 @@ GMS.StatusIcon = (function() {
         destroy: function() {
             $('.qtip').qtip('destroy');
         }
-    }
+    };
 })();
