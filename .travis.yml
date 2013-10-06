@@ -4,4 +4,4 @@ node_js:
 install:
   - npm install jshint -g
 script:
-  - jshint . --exclude data\vendor
+  - jshint . --exclude data/vendor
