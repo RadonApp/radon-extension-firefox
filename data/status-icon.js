@@ -20,8 +20,8 @@ GMS.StatusIcon = (function() {
                 text: content
             },
             position: {
-                my: 'top right',
-                at: 'bottom middle',
+                my: 'bottom left',
+                at: 'top right',
                 target: $icon
             },
             show: {
