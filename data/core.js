@@ -30,6 +30,10 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
+    this.version_number = [0, 6, 6];
+    this.version_branch = 'dev';
+    this.version = this.version_number.join('.') + '-' + this.version_branch;
+
     this.eventPrefix = 'GMS';
     this.ownerDocument = document;
 
@@ -38,6 +42,8 @@ var GMS = (function(port) {
     });
 
     return {
+        version: this.version,
+
         $object: $(this),
 
         open: function(url) {

@@ -1,5 +1,6 @@
 GMS.StatusIcon = (function() {
     var data = null,
+        $icon = null,
         $iconContainer = null,
         $setupPopup = null,
         remind = true;
@@ -14,14 +15,14 @@ GMS.StatusIcon = (function() {
             return;
         }
 
-        $iconContainer.qtip({
+        $icon.qtip({
             content: {
                 text: content
             },
             position: {
                 my: 'top right',
                 at: 'bottom middle',
-                target: $iconContainer
+                target: $icon
             },
             show: {
                 ready: true
@@ -48,24 +49,33 @@ GMS.StatusIcon = (function() {
     }
 
     function construct() {
-        $('#gbw').prepend(
-            '<div id="gms-icon-container">' +
-                '<img src="' + data.urls.icon24 + '"/>' +
-                '</div>'
+        if($('#playlists #gmm-icon-container').length < 1) {
+            $('#playlists').after(
+                '<div id="gmm-divider" class="nav-section-divider"></div>' +
+                '<div id="gmm-icon-container"></div>'
+            );
+        }
+
+        $iconContainer = $('#gmm-icon-container');
+
+        $icon = $(
+            '<img id="gms-icon" src="' + data.urls.icon24 + '" ' +
+            'style="display: none;" ' +
+            'title="Google Music Scrobbler - ' + GMS.version + '"/>'
         );
+        $iconContainer.append($icon);
 
         $('body').append(
             '<div id="gms-popup-setup">' +
                 "<p>Looks like you haven't finished setting up <b>Google Music Scrobbler</b></p>" +
                 '<div class="actions">' +
-                '<button class="button small primary setup">Setup now</button>' +
-                '<button class="button small remind">Remind me later</button>' +
-                '<button class="button small stop">Stop bothering me</button>' +
+                    '<button class="button small primary setup">Setup now</button>' +
+                    '<button class="button small remind">Remind me later</button>' +
+                    '<button class="button small stop">Stop bothering me</button>' +
                 '</div>' +
-                '</div>'
+            '</div>'
         );
 
-        $iconContainer = $('#gms-icon-container');
         $setupPopup = $('#gms-popup-setup');
 
         $('.button.setup', $setupPopup).bind('click', buttonClick);
