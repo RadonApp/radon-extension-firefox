@@ -51,7 +51,7 @@ var LFM = (function() {
 
         request.fail(function(jqxhr, status) {
             console.log('[call] failed: ' + status);
-        })
+        });
     }
 
     return {
@@ -59,7 +59,7 @@ var LFM = (function() {
         session: null,
 
         call: call
-    }
+    };
 })();
 
 LFM.track = {

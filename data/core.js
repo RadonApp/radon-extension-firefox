@@ -1,3 +1,5 @@
+/*jshint moz:true */
+
 $ = jQuery;
 
 var EventHelper = (function() {
@@ -28,6 +30,10 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
+    this.version_number = [0, 6, 6];
+    this.version_branch = 'dev';
+    this.version = this.version_number.join('.') + '-' + this.version_branch;
+
     this.eventPrefix = 'GMS';
     this.ownerDocument = document;
 
@@ -36,6 +42,8 @@ var GMS = (function(port) {
     });
 
     return {
+        version: this.version,
+
         $object: $(this),
 
         open: function(url) {
@@ -153,7 +161,7 @@ GMS.HookManager = (function(port) {
             parent.appendChild(dependant_scripts[i]);
         }
 
-        console.log('Client rebuilt, finished.')
+        console.log('Client rebuilt, finished.');
     }
 
     function setup(data) {
@@ -166,7 +174,7 @@ GMS.HookManager = (function(port) {
         dependant_scripts = [];
 
         var cur = lex_node.nextSibling;
-        while(cur != null) {
+        while(cur !== null) {
             if(cur.tagName == 'SCRIPT') {
                 dependant_scripts.push(cur);
                 parent.removeChild(cur);
@@ -211,7 +219,7 @@ GMS.Scrobbler = (function() {
             albumArtist: song[3], // TODO fix this
             track: song[14],
             durationMillis: song[13]
-        }
+        };
     }
 
     function setPlayingState(value) {
@@ -220,10 +228,10 @@ GMS.Scrobbler = (function() {
         }
         playing = value;
 
-        if(playing == true) {
+        if(playing === true) {
             $('#slider').attrmonitor('start');
             LFM.track.updateNowPlaying(current);
-        } else if(playing == false) {
+        } else if(playing === false) {
             $('#slider').attrmonitor('stop');
         }
     }
@@ -241,7 +249,7 @@ GMS.Scrobbler = (function() {
         var perc = now / max;
 
         // If over 50% played, submit it
-        if(perc >= .50) {
+        if(perc >= 0.50) {
             LFM.track.scrobble(current, currentTimestamp);
             currentSubmitted = true;
         }
