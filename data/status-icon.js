@@ -1,12 +1,69 @@
-var GMS_StatusIcon = {
-    $iconContainer: null,
+GMS.StatusIcon = (function() {
+    var data = null,
+        $icon = null,
+        $iconContainer = null,
+        $setupPopup = null,
+        remind = true;
 
-    initialize: function() {
-        $('#gbw').prepend(
-            '<div id="gms-icon-container">' +
-                '<img src="' + data.urls.icon24 + '"/>' +
-            '</div>'
+    function show(type) {
+        var content = null;
+        if(type == 'setup') {
+            content = $setupPopup;
+        }
+
+        if(content === null) {
+            return;
+        }
+
+        $icon.qtip({
+            content: {
+                text: content
+            },
+            position: {
+                my: 'bottom left',
+                at: 'top right',
+                target: $icon
+            },
+            show: {
+                ready: true
+            },
+            hide: {
+                event: ''
+            },
+            style: {
+                width: 480
+            }
+        });
+    }
+
+    function buttonClick(event) {
+        if($(this).hasClass('setup')) {
+            location.hash = '#/settings';
+        } else if($(this).hasClass('stop')) {
+            GMS.store({
+                setup_remind: false
+            });
+        }
+
+        GMS.StatusIcon.destroy();
+    }
+
+    function construct() {
+        if($('#playlists #gmm-icon-container').length < 1) {
+            $('#playlists').after(
+                '<div id="gmm-divider" class="nav-section-divider"></div>' +
+                '<div id="gmm-icon-container"></div>'
+            );
+        }
+
+        $iconContainer = $('#gmm-icon-container');
+
+        $icon = $(
+            '<img id="gms-icon" src="' + data.urls.icon24 + '" ' +
+            'style="display: none;" ' +
+            'title="Google Music Scrobbler - ' + GMS.version + '"/>'
         );
+        $iconContainer.append($icon);
 
         $('body').append(
             '<div id="gms-popup-setup">' +
@@ -19,71 +76,30 @@ var GMS_StatusIcon = {
             '</div>'
         );
 
-        this.$iconContainer = $('#gms-icon-container');
-        this.$setupPopup = $('#gms-popup-setup');
+        $setupPopup = $('#gms-popup-setup');
 
-        $('.button.setup', this.$setupPopup).bind('click', GMS_StatusIcon._setup);
-        $('.button.remind', this.$setupPopup).bind('click', GMS_StatusIcon._remind);
-        $('.button.stop', this.$setupPopup).bind('click', GMS_StatusIcon._stop);
-    },
-
-    showTooltip: function(type) {
-        var content = null;
-        if(type == 'setup') {
-            content = GMS_StatusIcon.$setupPopup;
-        }
-
-        if(content === null) {
-            return;
-        }
-
-        GMS_StatusIcon.$iconContainer.qtip({
-            content: {
-                text: content
-            },
-            position: {
-                my: 'top right',
-                at: 'bottom middle',
-                target: this.$iconContainer
-            },
-            show: {
-                ready: true
-            },
-            hide: {
-                event: ''
-            },
-            style: {
-                width: 480
-            }
-        });
-    },
-
-    destroy: function() {
-        $('.qtip').qtip('destroy');
-    },
-
-    _setup: function() {
-        location.hash = '#/settings';
-        GMS_StatusIcon.destroy();
-    },
-    _remind: function() {
-        GMS_StatusIcon.destroy();
-    },
-    _stop: function() {
-        self.port.emit('gms.store', {
-            setup_remind: false
-        });
-        GMS_StatusIcon.destroy();
+        $('.button.setup', $setupPopup).bind('click', buttonClick);
+        $('.button.remind', $setupPopup).bind('click', buttonClick);
+        $('.button.stop', $setupPopup).bind('click', buttonClick);
     }
-};
 
-self.port.on('gms.construct', function(data) {
-    var storage = data.storage,
-        setup_remind = storage.setup_remind == true || storage.setup_remind === undefined;
+    GMS.bind('construct', function(event, _data, storage) {
+        data = _data;
+        remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
-    GMS_StatusIcon.initialize();
+        construct();
+    });
 
-    if(lastfm.session === null && setup_remind) {
-        GMS_StatusIcon.showTooltip('setup');
-    }
-});
+    GMS.LoadingMonitor.bind('loaded', function() {
+        if(LFM.session === null && remind === true) {
+            show('setup');
+        }
+    });
+
+    return {
+        show: show,
+        destroy: function() {
+            $('.qtip').qtip('destroy');
+        }
+    };
+})();
