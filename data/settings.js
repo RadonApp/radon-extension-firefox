@@ -2,27 +2,17 @@
 // Google Music Scrobbler - Settings
 //
 
-GMS.Settings = (function() {
-    var $header = $(
-        '<div class="settings-section-header settings-lastfm" style="margin-top: 20px;">' +
-            '<div class="settings-title">Google Music Scrobbler</div>' +
-        '</div>'
-    );
-
-    var $options = $(
-        '<div class="settings-section-content">' +
-            '<div class="lastfm-action-section" style="display: inline-block;border-bottom-right-radius: 2px;border-top-right-radius: 2px;">' +
-                '<button id="authorization" class="button" data-state="link">Link Account</button>' +
-                '<span id="authorization-status" style="margin: 0 10px 0 5px;font-style: italic;color: #AAAAAA;"></span>' +
-            '</div>' +
-        '</div>'
-    );
-
-    var $myDevice = null,
-        $actionSection = null,
-        $authorizationButton = null,
+GMS.AuthorizationSettings = (function() {
+    var $authorizationButton = null,
         $authorizationStatus = null,
         currentToken = null;
+
+    var $section = $(
+        '<div class="lastfm-action-section">' +
+            '<button id="authorization" class="button" data-state="link">Link Account</button>' +
+            '<span id="authorization-status"></span>' +
+        '</div>'
+    );
 
     function setStatus(status, backgroundColor, textColor, disabled) {
         backgroundColor = backgroundColor !== undefined ? backgroundColor : '';
@@ -31,7 +21,7 @@ GMS.Settings = (function() {
 
         $authorizationStatus.html(status);
         $authorizationStatus.css('color', textColor);
-        $actionSection.css('background-color', backgroundColor);
+        $section.css('background-color', backgroundColor);
 
         if(disabled) {
             $authorizationButton.attr('disabled', 'disabled');
@@ -121,21 +111,83 @@ GMS.Settings = (function() {
         }
     }
 
+    return {
+        construct: function($options) {
+            $options.append($section);
+
+            $authorizationButton = $('button#authorization', $section);
+            $authorizationStatus = $('span#authorization-status', $section);
+
+            // Update element state if we have an existing session
+            if(LFM.session !== null) {
+                setState('unlink');
+            }
+
+            $authorizationButton.unbind('click').bind('click', authorizationClick);
+        }
+    };
+})();
+
+GMS.MiscSettings = (function() {
+    var $section = null;
+
+    function checkbox_change(event) {
+        var $control = $('#' + event.data.id, $section);
+
+        GMS.setOption(event.data.key, $control.prop('checked'));
+    }
+
+    function create_checkbox(key, id, label) {
+        var $control = $(
+            '<div class="lastfm-control" key="' + key + '">' +
+                '<input id="' + id + '" type="checkbox">' +
+                '<label for="' + id + '">' + label + '</label>' +
+            '</div>'
+        );
+
+        if(GMS.getOption(key) == true) {
+            $('input[type="checkbox"]', $control).prop('checked', true);
+        }
+
+        $control.change({
+            key: key,
+            id: id
+        }, checkbox_change);
+
+        $section.append($control);
+        return $control;
+    }
+
+    return {
+        construct: function($options) {
+            $section = $('<div class="lastfm-misc-section"></div>');
+
+            create_checkbox('display_icon', 'lastfm-display-icon', 'Display status icon');
+
+            $options.append($section);
+        }
+    }
+})();
+
+GMS.Settings = (function() {
+    var $header = $(
+        '<div class="settings-section-header settings-lastfm">' +
+            '<div class="settings-title">Google Music Scrobbler</div>' +
+        '</div>'
+    );
+
+    var $options = null,
+        $myDevice = null;
+
     function construct(panel) {
         $myDevice = $('.settings-manager-my-device', panel);
         $header.insertBefore($myDevice);
+
+        $options = $('<div class="settings-section-content"></div>');
         $options.insertAfter($header);
 
-        $actionSection = $('.lastfm-action-section', $options);
-        $authorizationButton = $('button#authorization', $options);
-        $authorizationStatus = $('span#authorization-status', $options);
-
-        // Update element state if we have an existing session
-        if(LFM.session !== null) {
-            setState('unlink');
-        }
-
-        $authorizationButton.unbind('click').bind('click', authorizationClick);
+        GMS.AuthorizationSettings.construct($options);
+        GMS.MiscSettings.construct($options);
     }
 
     // Construct when the settings panel is opened

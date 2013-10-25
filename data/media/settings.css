@@ -1,0 +1,24 @@
+.settings-lastfm.settings-section-header {
+    margin-top: 20px;
+}
+
+.lastfm-action-section {
+    display: inline-block;
+
+    border-bottom-right-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+    .lastfm-action-section #authorization-status {
+        margin: 0 10px 0 5px;
+        font-style: italic;
+        color: #AAAAAA;
+    }
+
+.lastfm-misc-section {
+    margin-top: 12px;
+}
+
+.lastfm-control input[type="checkbox"] {
+    vertical-align: -2px;
+}

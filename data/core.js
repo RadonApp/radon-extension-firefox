@@ -37,14 +37,19 @@ var GMS = (function(port) {
     this.eventPrefix = 'GMS';
     this.ownerDocument = document;
 
-    port.on('gms.construct', function(data) {
-        EventHelper.trigger(GMS, 'construct', [data, data.storage !== undefined ? data.storage : {}]);
-    });
+    this.options = {};
+    this.option_defaults = {};
 
     return {
         version: this.version,
+        options: this.options,
+        option_defaults: this.option_defaults,
 
         $object: $(this),
+
+        construct: function(data) {
+            EventHelper.trigger(GMS, 'construct', [data, data.storage !== undefined ? data.storage : {}]);
+        },
 
         open: function(url) {
             port.emit('gms.open', url);
@@ -58,6 +63,23 @@ var GMS = (function(port) {
                     session: LFM.session
                 }
             });
+        },
+
+        getOption: function(key) {
+            if(GMS.options[key] !== undefined) {
+                return GMS.options[key];
+            }
+
+            return GMS.option_defaults[key];
+        },
+        setOption: function(key, value) {
+            GMS.options[key] = value;
+
+            GMS.store({
+                options: GMS.options
+            });
+
+            EventHelper.trigger(GMS, 'option_changed', [key, value]);
         },
 
         bind: function(eventType, eventData, handler) {
@@ -291,7 +313,16 @@ self.port.on('gms.construct', function(data) {
            storage.lastfm.session !== undefined) {
             LFM.session = storage.lastfm.session;
         }
+
+        // Load configuration
+        if(storage.options !== undefined) {
+            Object.keys(storage.options).forEach(function(key) {
+                GMS.options[key] = storage.options[key];
+            });
+        }
     }
+
+    GMS.construct(data);
 
     // INSERT page.js
     $('body').append('<script type="text/javascript" src="' + data.pageUrl + '"></script>');
