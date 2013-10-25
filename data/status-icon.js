@@ -6,7 +6,7 @@ GMS.StatusIcon = (function() {
         $setupPopup = null,
         remind = true;
 
-    GMS.option_defaults['display_icon'] = true;
+    GMS.option_defaults.display_icon = true;
 
     function show(type) {
         if($icon === null) {

@@ -145,7 +145,7 @@ GMS.MiscSettings = (function() {
             '</div>'
         );
 
-        if(GMS.getOption(key) == true) {
+        if(GMS.getOption(key) === true) {
             $('input[type="checkbox"]', $control).prop('checked', true);
         }
 
@@ -166,7 +166,7 @@ GMS.MiscSettings = (function() {
 
             $options.append($section);
         }
-    }
+    };
 })();
 
 GMS.Settings = (function() {
