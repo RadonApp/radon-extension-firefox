@@ -15,6 +15,8 @@ GMS.StatusIcon = (function() {
             return;
         }
 
+        $setupPopup.css('display', 'block');
+
         $icon.qtip({
             content: {
                 text: content
@@ -66,7 +68,7 @@ GMS.StatusIcon = (function() {
         $iconContainer.append($icon);
 
         $('body').append(
-            '<div id="gms-popup-setup">' +
+            '<div id="gms-popup-setup" style="display: none;">' +
                 "<p>Looks like you haven't finished setting up <b>Google Music Scrobbler</b></p>" +
                 '<div class="actions">' +
                     '<button class="button small primary setup">Setup now</button>' +
@@ -100,6 +102,7 @@ GMS.StatusIcon = (function() {
         show: show,
         destroy: function() {
             $('.qtip').qtip('destroy');
+            $setupPopup.css('display', 'none');
         }
     };
 })();
