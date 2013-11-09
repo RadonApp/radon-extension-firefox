@@ -5,7 +5,6 @@ function dispatchEvent(type, detail) {
 }
 
 var capture_events = [
-    'playSong',
     'playPause',
     'songUnPaused',
     'navigate',
