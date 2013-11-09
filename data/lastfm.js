@@ -73,17 +73,11 @@ LFM.track = {
             track: track.title,
             artist: track.artist,
             album: track.album,
-            trackNumber: track.track,
             duration: track.durationMillis / 1000
         };
 
-        // Add albumArtist if it differs from artist
-        if(track.artist != track.albumArtist) {
-            params.albumArtist = track.albumArtist;
-        }
-
         LFM.call('track.updateNowPlaying', function(result) {
-            // TODO check result
+            console.log(result);
         }, params);
     },
     scrobble: function(track, timestamp) {
@@ -96,14 +90,13 @@ LFM.track = {
             track: track.title,
             artist: track.artist,
             album: track.album,
-            trackNumber: track.track,
             duration: track.durationMillis / 1000,
 
             timestamp: timestamp
         };
 
         LFM.call('track.scrobble', function(result) {
-            // TODO check result
+            console.log(result);
         }, params);
     }
 };
