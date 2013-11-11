@@ -2,10 +2,17 @@ GMS.StatusIcon = (function() {
     var data = null,
         $icon = null,
         $iconContainer = null,
+        $iconContainerDivider = null,
         $setupPopup = null,
         remind = true;
 
+    GMS.option_defaults.display_icon = true;
+
     function show(type) {
+        if($icon === null) {
+            return;
+        }
+
         var content = null;
         if(type == 'setup') {
             content = $setupPopup;
@@ -50,6 +57,35 @@ GMS.StatusIcon = (function() {
         GMS.StatusIcon.destroy();
     }
 
+    function set_visibility(visible) {
+        if(visible) {
+            if($('#gms-icon', $iconContainer).length > 0) {
+                return;
+            }
+
+            $icon = $(
+                '<img id="gms-icon" src="' + data.urls.icon24 + '" ' +
+                'style="display: none;" ' +
+                'title="Google Music Scrobbler - ' + GMS.version + '"/>'
+            );
+
+            $iconContainer.append($icon);
+
+            $iconContainerDivider.css('display', 'block');
+            $iconContainer.css('display', 'block');
+        } else {
+            if($icon !== null) {
+                $icon.remove();
+            }
+            $icon = null;
+
+            if($iconContainer.children().length < 1) {
+                $iconContainerDivider.css('display', 'none');
+                $iconContainer.css('display', 'none');
+            }
+        }
+    }
+
     function construct() {
         if($('#playlists #gmm-icon-container').length < 1) {
             $('#playlists').after(
@@ -58,14 +94,10 @@ GMS.StatusIcon = (function() {
             );
         }
 
+        $iconContainerDivider = $('#gmm-divider');
         $iconContainer = $('#gmm-icon-container');
 
-        $icon = $(
-            '<img id="gms-icon" src="' + data.urls.icon24 + '" ' +
-            'style="display: none;" ' +
-            'title="Google Music Scrobbler - ' + GMS.version + '"/>'
-        );
-        $iconContainer.append($icon);
+        set_visibility(GMS.getOption('display_icon'));
 
         $('body').append(
             '<div id="gms-popup-setup" style="display: none;">' +
@@ -90,6 +122,13 @@ GMS.StatusIcon = (function() {
         remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
         construct();
+    });
+
+    GMS.bind('option_changed', function(event, key, value) {
+        console.log(key);
+        if(key == 'display_icon') {
+            set_visibility(value);
+        }
     });
 
     GMS.LoadingMonitor.bind('loaded', function() {

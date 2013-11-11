@@ -30,21 +30,26 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 6, 7];
+    this.version_number = [0, 6, 8, 1];
     this.version_branch = 'master';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
     this.eventPrefix = 'GMS';
     this.ownerDocument = document;
 
-    port.on('gms.construct', function(data) {
-        EventHelper.trigger(GMS, 'construct', [data, data.storage !== undefined ? data.storage : {}]);
-    });
+    this.options = {};
+    this.option_defaults = {};
 
     return {
         version: this.version,
+        options: this.options,
+        option_defaults: this.option_defaults,
 
         $object: $(this),
+
+        construct: function(data) {
+            EventHelper.trigger(GMS, 'construct', [data, data.storage !== undefined ? data.storage : {}]);
+        },
 
         open: function(url) {
             port.emit('gms.open', url);
@@ -58,6 +63,23 @@ var GMS = (function(port) {
                     session: LFM.session
                 }
             });
+        },
+
+        getOption: function(key) {
+            if(GMS.options[key] !== undefined) {
+                return GMS.options[key];
+            }
+
+            return GMS.option_defaults[key];
+        },
+        setOption: function(key, value) {
+            GMS.options[key] = value;
+
+            GMS.store({
+                options: GMS.options
+            });
+
+            EventHelper.trigger(GMS, 'option_changed', [key, value]);
         },
 
         bind: function(eventType, eventData, handler) {
@@ -106,6 +128,7 @@ GMS.SliderMonitor = (function() {
             sliderMin = event.value;
         } else if(event.attribute == 'aria-valuemax') {
             sliderMax = event.value;
+            EventHelper.trigger(GMS.SliderMonitor, 'maxChange', [sliderMax]);
         }
     }
 
@@ -113,7 +136,7 @@ GMS.SliderMonitor = (function() {
         $('#slider').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,
-            start: false,
+            start: true,
             callback: change
         });
     });
@@ -209,35 +232,34 @@ GMS.Scrobbler = (function() {
         currentTimestamp = null,
         currentSubmitted = false;
 
-    function unpack_song(song) {
-        song = song.a;
-
-        return {
-            title: song[1],
-            album: song[4],
-            artist: song[3],
-            albumArtist: song[3], // TODO fix this
-            track: song[14],
-            durationMillis: song[13]
-        };
-    }
-
     function setPlayingState(value) {
         if(value === undefined) {
             value = !playing;
         }
         playing = value;
 
+        console.log('setPlayingState, playing: ' + playing);
+
         if(playing === true) {
-            $('#slider').attrmonitor('start');
             LFM.track.updateNowPlaying(current);
-        } else if(playing === false) {
-            $('#slider').attrmonitor('stop');
         }
     }
 
+    GMS.SliderMonitor.bind('maxChange', function(event, max) {
+        current = null;
+    });
+
     GMS.SliderMonitor.bind('positionChange', function(event, min, max, now) {
-        if(current === null || currentSubmitted) {
+        if(now <= 2000) {
+            current = null;
+            return;
+        }
+
+        if(current === null) {
+            updateCurrentMedia(max);
+        }
+
+        if(currentSubmitted) {
             return;
         }
 
@@ -259,24 +281,29 @@ GMS.Scrobbler = (function() {
         setPlayingState();
     });
 
-    document.documentElement.addEventListener('gm.playSong', function(event) {
-        console.log('gm.playSong');
+    function setPlaying(song) {
+        current = song;
+        currentTimestamp = Math.round(new Date().getTime() / 1000);
+        currentSubmitted = false;
 
-        if(event.detail !== null && event.detail.song !== undefined) {
-            current = unpack_song(event.detail.song);
-            currentTimestamp = Math.round(new Date().getTime() / 1000);
-            currentSubmitted = false;
+        console.log('    title: ' + current.title);
+        console.log('    album: ' + current.album);
+        console.log('    artist: ' + current.artist);
+        console.log('    durationMillis: ' + current.durationMillis);
 
-            console.log('    title: ' + current.title);
-            console.log('    album: ' + current.album);
-            console.log('    artist: ' + current.artist);
-            console.log('    albumArtist: ' + current.albumArtist);
-            console.log('    track: ' + current.track);
-            console.log('    durationMillis: ' + current.durationMillis);
+        setPlayingState(true);
+    }
 
-            setPlayingState(true);
-        }
-    });
+    function updateCurrentMedia(durationMillis) {
+        var $playerSongInfo = $('#playerSongInfo');
+
+        setPlaying({
+            'title': $('.playerSongTitle', $playerSongInfo).text(),
+            'album': $('.player-album', $playerSongInfo).text(),
+            'artist': $('.player-artist', $playerSongInfo).text(),
+            'durationMillis': durationMillis
+        });
+    }
 
     return {};
 })();
@@ -291,7 +318,16 @@ self.port.on('gms.construct', function(data) {
            storage.lastfm.session !== undefined) {
             LFM.session = storage.lastfm.session;
         }
+
+        // Load configuration
+        if(storage.options !== undefined) {
+            Object.keys(storage.options).forEach(function(key) {
+                GMS.options[key] = storage.options[key];
+            });
+        }
     }
+
+    GMS.construct(data);
 
     // INSERT page.js
     $('body').append('<script type="text/javascript" src="' + data.pageUrl + '"></script>');
