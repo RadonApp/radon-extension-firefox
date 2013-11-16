@@ -176,12 +176,13 @@ GMS.Settings = (function() {
         '</div>'
     );
 
-    var $options = null,
-        $myDevice = null;
+    var $options = null;
 
     function construct(panel) {
-        $myDevice = $('.settings-manager-my-device', panel);
-        $header.insertBefore($myDevice);
+        var headers = $('.settings-section-header', panel);
+
+        // Insert our settings just before the last header (Manage My Devices)
+        $header.insertBefore(headers[headers.length - 1]);
 
         $options = $('<div class="settings-section-content"></div>');
         $options.insertAfter($header);
