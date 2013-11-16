@@ -30,7 +30,7 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 6, 8, 1];
+    this.version_number = [0, 6, 9];
     this.version_branch = 'master';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
