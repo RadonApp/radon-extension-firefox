@@ -73,7 +73,7 @@ LFM.track = {
             track: track.title,
             artist: track.artist,
             album: track.album,
-            duration: track.durationMillis / 1000
+            duration: Math.floor(track.durationMillis / 1000)
         };
 
         LFM.call('track.updateNowPlaying', function(result) {
@@ -90,7 +90,7 @@ LFM.track = {
             track: track.title,
             artist: track.artist,
             album: track.album,
-            duration: track.durationMillis / 1000,
+            duration: Math.floor(track.durationMillis / 1000),
 
             timestamp: timestamp
         };
