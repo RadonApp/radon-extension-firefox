@@ -171,20 +171,22 @@ GMS.MiscSettings = (function() {
 
 GMS.Settings = (function() {
     var $header = $(
-        '<div class="settings-section-header settings-lastfm">' +
-            '<div class="settings-title">Google Music Scrobbler</div>' +
+        '<div class="settings-cluster">' +
+            '<div class="header">' +
+                '<div class="title">Google Music Scrobbler</div>' +
+            '</div>' +
         '</div>'
     );
 
     var $options = null;
 
     function construct(panel) {
-        var headers = $('.settings-section-header', panel);
+        var headers = $('.settings-cluster', panel);
 
         // Insert our settings just before the last header (Manage My Devices)
         $header.insertBefore(headers[headers.length - 1]);
 
-        $options = $('<div class="settings-section-content"></div>');
+        $options = $('<div class="settings-section-content" style="padding-top: 5px;"></div>');
         $options.insertAfter($header);
 
         GMS.AuthorizationSettings.construct($options);
