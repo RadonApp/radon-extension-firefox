@@ -180,8 +180,23 @@ GMS.Settings = (function() {
 
     var $options = null;
 
-    function construct(panel) {
+    function construct(panel, retry_num) {
         var headers = $('.settings-cluster', panel);
+
+        // Settings haven't finished loading, retry in 200ms
+        if(headers.length === 0) {
+            if(retry_num === undefined) {
+                retry_num = 0;
+            }
+
+            // Settings haven't loaded in 10 seconds, stop trying to inject.
+            if(retry_num > 50) {
+                return;
+            }
+
+            console.log("settings haven't finished loading, retry #" + retry_num);
+            setTimeout(function() { construct(panel, retry_num + 1); }, 200);
+        }
 
         // Insert our settings just before the last header (Manage My Devices)
         $header.insertBefore(headers[headers.length - 1]);
