@@ -204,7 +204,9 @@ GMS.Scrobbler = (function() {
     var current = null,
         playing = false,
         currentTimestamp = null,
-        currentSubmitted = false;
+        currentSubmitted = false,
+        lastPosition = null,
+        lastTimestamp = null;
 
     function setPlayingState(value) {
         if(value === undefined) {
@@ -228,6 +230,20 @@ GMS.Scrobbler = (function() {
             current = null;
             return;
         }
+
+        if(current !== null && lastPosition !== null) {
+            var change = now - lastPosition,
+                span = (new Date().getTime()) - lastTimestamp,
+                diff = span - change;
+
+            if(diff > 10000) {
+                console.log('Song was probably paused, rebuilding state (to trigger now-playing update)');
+                current = null;
+            }
+        }
+
+        lastPosition = now;
+        lastTimestamp = new Date().getTime();
 
         if(current === null) {
             updateCurrentMedia(max);
@@ -255,6 +271,7 @@ GMS.Scrobbler = (function() {
         current = song;
         currentTimestamp = Math.round(new Date().getTime() / 1000);
         currentSubmitted = false;
+        lastPosition = null;
 
         console.log('    title: ' + current.title);
         console.log('    album: ' + current.album);
