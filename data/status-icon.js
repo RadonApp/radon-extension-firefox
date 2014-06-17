@@ -121,19 +121,19 @@ GMS.StatusIcon = (function() {
         data = _data;
         remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
-        construct();
+        document.documentElement.addEventListener('gm.pageLoaded', function(event) {
+            construct();
+
+            if(LFM.session === null && remind === true) {
+                show('setup');
+            }
+        });
     });
 
     GMS.bind('option_changed', function(event, key, value) {
         console.log(key);
         if(key == 'display_icon') {
             set_visibility(value);
-        }
-    });
-
-    GMS.LoadingMonitor.bind('loaded', function() {
-        if(LFM.session === null && remind === true) {
-            show('setup');
         }
     });
 
