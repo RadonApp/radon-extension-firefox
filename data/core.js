@@ -30,8 +30,8 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 6, 10, 3];
-    this.version_branch = 'dev';
+    this.version_number = [0, 7, 0];
+    this.version_branch = 'beta';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
     this.eventPrefix = 'GMS';
