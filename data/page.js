@@ -9,7 +9,8 @@ var capture_events = [
     'playPause',
     'songUnPaused',
     'navigate',
-    'showPanel'
+    'showPanel',
+    'pageLoaded'
 ];
 
 window.gms_event = function(event) {

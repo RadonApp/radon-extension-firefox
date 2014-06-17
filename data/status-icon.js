@@ -121,7 +121,9 @@ GMS.StatusIcon = (function() {
         data = _data;
         remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
-        construct();
+        document.documentElement.addEventListener('gm.pageLoaded', function(event) {
+            construct();
+        });
     });
 
     GMS.bind('option_changed', function(event, key, value) {
