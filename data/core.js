@@ -30,7 +30,7 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 6, 10];
+    this.version_number = [0, 7, 0];
     this.version_branch = 'beta';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
@@ -88,32 +88,6 @@ var GMS = (function(port) {
     };
 })(self.port);
 
-GMS.LoadingMonitor = (function() {
-    this.eventPrefix = 'GMS.LoadingMonitor';
-    this.ownerDocument = document;
-
-    $('#loading-progress').attrmonitor({
-        attributes: ['style'],
-        callback: function(event) {
-            if(event.attribute == 'style' &&
-                event.value !== null &&
-                event.value.replace(' ', '').indexOf('display:none;') !== -1)
-            {
-                EventHelper.trigger(GMS.LoadingMonitor, 'loaded');
-                $('#loading-progress').attrmonitor('destroy');
-            }
-        }
-    });
-
-    return {
-        $object: $(this),
-
-        bind: function(eventType, eventData, handler) {
-            EventHelper.bind(GMS.LoadingMonitor, eventType, eventData, handler);
-        }
-    };
-})();
-
 GMS.SliderMonitor = (function() {
     this.eventPrefix = 'GMS.SliderMonitor';
     this.ownerDocument = document;
@@ -132,7 +106,7 @@ GMS.SliderMonitor = (function() {
         }
     }
 
-    GMS.LoadingMonitor.bind('loaded', function() {
+    document.documentElement.addEventListener('gm.pageLoaded', function() {
         $('#slider').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,
@@ -230,7 +204,9 @@ GMS.Scrobbler = (function() {
     var current = null,
         playing = false,
         currentTimestamp = null,
-        currentSubmitted = false;
+        currentSubmitted = false,
+        lastPosition = null,
+        lastTimestamp = null;
 
     function setPlayingState(value) {
         if(value === undefined) {
@@ -255,6 +231,20 @@ GMS.Scrobbler = (function() {
             return;
         }
 
+        if(current !== null && lastPosition !== null) {
+            var change = now - lastPosition,
+                span = (new Date().getTime()) - lastTimestamp,
+                diff = span - change;
+
+            if(diff > 10000) {
+                console.log('Song was probably paused, rebuilding state (to trigger now-playing update)');
+                current = null;
+            }
+        }
+
+        lastPosition = now;
+        lastTimestamp = new Date().getTime();
+
         if(current === null) {
             updateCurrentMedia(max);
         }
@@ -277,14 +267,11 @@ GMS.Scrobbler = (function() {
         }
     });
 
-    document.documentElement.addEventListener('gm.playPause', function() {
-        setPlayingState();
-    });
-
     function setPlaying(song) {
         current = song;
         currentTimestamp = Math.round(new Date().getTime() / 1000);
         currentSubmitted = false;
+        lastPosition = null;
 
         console.log('    title: ' + current.title);
         console.log('    album: ' + current.album);
