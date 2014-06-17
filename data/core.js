@@ -88,32 +88,6 @@ var GMS = (function(port) {
     };
 })(self.port);
 
-GMS.LoadingMonitor = (function() {
-    this.eventPrefix = 'GMS.LoadingMonitor';
-    this.ownerDocument = document;
-
-    $('#loading-progress').attrmonitor({
-        attributes: ['style'],
-        callback: function(event) {
-            if(event.attribute == 'style' &&
-                event.value !== null &&
-                event.value.replace(' ', '').indexOf('display:none;') !== -1)
-            {
-                EventHelper.trigger(GMS.LoadingMonitor, 'loaded');
-                $('#loading-progress').attrmonitor('destroy');
-            }
-        }
-    });
-
-    return {
-        $object: $(this),
-
-        bind: function(eventType, eventData, handler) {
-            EventHelper.bind(GMS.LoadingMonitor, eventType, eventData, handler);
-        }
-    };
-})();
-
 GMS.SliderMonitor = (function() {
     this.eventPrefix = 'GMS.SliderMonitor';
     this.ownerDocument = document;
@@ -132,7 +106,7 @@ GMS.SliderMonitor = (function() {
         }
     }
 
-    GMS.LoadingMonitor.bind('loaded', function() {
+    document.documentElement.addEventListener('gm.pageLoaded', function() {
         $('#slider').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,
@@ -275,10 +249,6 @@ GMS.Scrobbler = (function() {
             LFM.track.scrobble(current, currentTimestamp);
             currentSubmitted = true;
         }
-    });
-
-    document.documentElement.addEventListener('gm.playPause', function() {
-        setPlayingState();
     });
 
     function setPlaying(song) {

@@ -123,6 +123,10 @@ GMS.StatusIcon = (function() {
 
         document.documentElement.addEventListener('gm.pageLoaded', function(event) {
             construct();
+
+            if(LFM.session === null && remind === true) {
+                show('setup');
+            }
         });
     });
 
@@ -130,12 +134,6 @@ GMS.StatusIcon = (function() {
         console.log(key);
         if(key == 'display_icon') {
             set_visibility(value);
-        }
-    });
-
-    GMS.LoadingMonitor.bind('loaded', function() {
-        if(LFM.session === null && remind === true) {
-            show('setup');
         }
     });
 
