@@ -107,7 +107,7 @@ GMS.SliderMonitor = (function() {
     }
 
     document.addEventListener('gm.pageLoaded', function() {
-        $('#slider').attrmonitor({
+        $('#material-player-progress').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,
             start: true,
@@ -209,7 +209,7 @@ GMS.Scrobbler = (function() {
         var $playerSongInfo = $('#playerSongInfo');
 
         setPlaying({
-            'title': $('.playerSongTitle', $playerSongInfo).text(),
+            'title': $('#player-song-title', $playerSongInfo).text(),
             'album': $('.player-album', $playerSongInfo).text(),
             'artist': $('.player-artist', $playerSongInfo).text(),
             'durationMillis': durationMillis
