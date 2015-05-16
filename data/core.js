@@ -30,7 +30,7 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 7, 0];
+    this.version_number = [0, 7, 5];
     this.version_branch = 'dev';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
@@ -165,6 +165,12 @@ GMS.HookManager = (function(port) {
         console.log("Using \"" + data.lex_location + "\" url for listen_extended");
 
         var lex_node = $('script[blocked=true]')[0];
+
+        if(lex_node == null) {
+            console.log('lex node not found');
+            return;
+        }
+
         parent = lex_node.parentNode;
 
         // Pull out all the following dependant script nodes
