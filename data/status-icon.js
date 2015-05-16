@@ -25,6 +25,8 @@ GMS.StatusIcon = (function() {
         $setupPopup.css('display', 'block');
 
         $icon.qtip({
+            suppress: false,
+
             content: {
                 text: content
             },
@@ -88,7 +90,7 @@ GMS.StatusIcon = (function() {
 
     function construct() {
         if($('#playlists #gmm-icon-container').length < 1) {
-            $('#playlists').after(
+            $('#nav').append(
                 '<div id="gmm-divider" class="nav-section-divider"></div>' +
                 '<div id="gmm-icon-container"></div>'
             );
