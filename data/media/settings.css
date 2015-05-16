@@ -1,24 +1,32 @@
-.settings-lastfm.settings-section-header {
-    margin-top: 20px;
-}
-
-.lastfm-action-section {
+#gms-actions {
     display: inline-block;
 
     border-bottom-right-radius: 2px;
     border-top-right-radius: 2px;
+
+    margin-bottom: 10px;
 }
 
-    .lastfm-action-section #authorization-status {
-        margin: 0 10px 0 5px;
-        font-style: italic;
-        color: #AAAAAA;
+    #gms-actions sj-paper-button {
+        margin-bottom: -5px;
     }
 
-.lastfm-misc-section {
-    margin-top: 12px;
+    #gms-actions .status {
+        font-style: italic;
+        color: #AAAAAA;
+
+        margin: 0 10px;
+        vertical-align: 7px;
+    }
+
+#gms-status-icon-label {
+    height: 34px;
 }
 
-.lastfm-control input[type="checkbox"] {
-    vertical-align: -2px;
+#gms-status-icon-checkbox {
+    margin-right: 16px;
+}
+
+.qtip-fixed {
+    position: fixed;
 }
