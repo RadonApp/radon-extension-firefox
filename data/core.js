@@ -30,7 +30,7 @@ var EventHelper = (function() {
 })();
 
 var GMS = (function(port) {
-    this.version_number = [0, 7, 0];
+    this.version_number = [0, 8, 0];
     this.version_branch = 'beta';
     this.version = this.version_number.join('.') + '-' + this.version_branch;
 
@@ -106,8 +106,8 @@ GMS.SliderMonitor = (function() {
         }
     }
 
-    document.documentElement.addEventListener('gm.pageLoaded', function() {
-        $('#slider').attrmonitor({
+    document.addEventListener('gm.pageLoaded', function() {
+        $('#material-player-progress').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,
             start: true,
@@ -123,82 +123,6 @@ GMS.SliderMonitor = (function() {
         }
     };
 })();
-
-GMS.HookManager = (function(port) {
-    const RE_LEX_ANCHOR = /var\s(\w)=\{eventName:.*?,eventSrc:.*?,payload:.*?\},\w=.*?;/i;
-
-    var parent = null,
-        dependant_scripts = null;
-
-    function insert_lex_hook(lex_data) {
-        var match = RE_LEX_ANCHOR.exec(lex_data);
-        var slice_start = match.index + match[0].length;
-
-        var head = lex_data.slice(0, slice_start);
-        var tail = lex_data.slice(slice_start, lex_data.length);
-
-        return head + "if(window.gms_event !== undefined){window.gms_event(" + match[1] + ");}" + tail;
-    }
-
-    function create_lex(lex_data) {
-        var node = document.createElement("script");
-        node.type = "text/javascript";
-        node.text = insert_lex_hook(lex_data);
-
-        return node;
-    }
-
-    function rebuild(lex_data) {
-        console.log('Rebuilding client...');
-
-        // Re-insert new lex and dependant scripts into the document
-        parent.appendChild(create_lex(lex_data));
-
-        for(var i = 0; i < dependant_scripts.length; i++) {
-            parent.appendChild(dependant_scripts[i]);
-        }
-
-        console.log('Client rebuilt, finished.');
-    }
-
-    function setup(data) {
-        console.log("Using \"" + data.lex_location + "\" url for listen_extended");
-
-        var lex_node = $('script[blocked=true]')[0];
-        parent = lex_node.parentNode;
-
-        // Pull out all the following dependant script nodes
-        dependant_scripts = [];
-
-        var cur = lex_node.nextSibling;
-        while(cur !== null) {
-            if(cur.tagName == 'SCRIPT') {
-                dependant_scripts.push(cur);
-                parent.removeChild(cur);
-            }
-            cur = cur.nextSibling;
-        }
-        console.log('pulled out ' + dependant_scripts.length + ' dependant script nodes');
-
-        // Remove lex node from the document
-        parent.removeChild(lex_node);
-
-        // Request lex script, then rebuild the client
-        console.log('Requesting lex...');
-
-        port.emit('gms.lex_request', {
-            url: data.lex_location
-        });
-
-        port.once('gms.lex_response', rebuild);
-    }
-
-    GMS.bind('construct', function(event, data) {
-        setup(data);
-    });
-
-    return {};
-})(self.port);
 
 GMS.Scrobbler = (function() {
     var current = null,
@@ -285,7 +209,7 @@ GMS.Scrobbler = (function() {
         var $playerSongInfo = $('#playerSongInfo');
 
         setPlaying({
-            'title': $('.playerSongTitle', $playerSongInfo).text(),
+            'title': $('#player-song-title', $playerSongInfo).text(),
             'album': $('.player-album', $playerSongInfo).text(),
             'artist': $('.player-artist', $playerSongInfo).text(),
             'durationMillis': durationMillis
