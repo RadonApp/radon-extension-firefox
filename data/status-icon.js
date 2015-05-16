@@ -32,8 +32,13 @@ GMS.StatusIcon = (function() {
             },
             position: {
                 my: 'bottom left',
-                at: 'top right',
-                target: $icon
+                at: 'bottom left',
+                target: $(window),
+
+                adjust: {
+                    x: 2,
+                    y: -2
+                }
             },
             show: {
                 ready: true
@@ -42,6 +47,9 @@ GMS.StatusIcon = (function() {
                 event: ''
             },
             style: {
+                classes: 'qtip-fixed',
+                tip: false,
+
                 width: 480
             }
         });
@@ -49,7 +57,7 @@ GMS.StatusIcon = (function() {
 
     function buttonClick(event) {
         if($(this).hasClass('setup')) {
-            location.hash = '#/settings';
+            location.hash = '#/accountsettings';
         } else if($(this).hasClass('stop')) {
             GMS.store({
                 setup_remind: false
@@ -133,7 +141,7 @@ GMS.StatusIcon = (function() {
     });
 
     GMS.bind('option_changed', function(event, key, value) {
-        console.log(key);
+
         if(key == 'display_icon') {
             set_visibility(value);
         }
@@ -142,7 +150,9 @@ GMS.StatusIcon = (function() {
     return {
         show: show,
         destroy: function() {
-            $('.qtip').qtip('destroy');
+            $('.qtip').css('display', 'none')
+                      .qtip('destroy');
+
             $setupPopup.css('display', 'none');
         }
     };
