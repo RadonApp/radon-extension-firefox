@@ -106,7 +106,7 @@ GMS.SliderMonitor = (function() {
         }
     }
 
-    document.documentElement.addEventListener('gm.pageLoaded', function() {
+    document.addEventListener('gm.pageLoaded', function() {
         $('#slider').attrmonitor({
             attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
             interval: 1000,

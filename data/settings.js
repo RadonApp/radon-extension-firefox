@@ -209,7 +209,7 @@ GMS.Settings = (function() {
     }
 
     // Construct when the settings panel is opened
-    document.documentElement.addEventListener('gm.showPanel', function(event) {
+    document.addEventListener('gm.showPanel', function(event) {
         var elem = event.detail.element;
 
         if(elem === undefined) {
