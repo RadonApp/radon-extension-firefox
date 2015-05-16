@@ -16,9 +16,33 @@ function processEvent(event) {
     // trigger initial 'gm.showPanel' event
     if(event.eventName == 'pageLoaded') {
         dispatchEvent('gm.showPanel', {
-            element: document.querySelector('#main')
+            element: getNode(document.querySelector('#main'))
         });
     }
+}
+
+function getNode(element) {
+    if(typeof element !== 'object') {
+        return element;
+    }
+
+    for(var key in element) {
+        if (!element.hasOwnProperty(key)) {
+            continue;
+        }
+
+        var value = element[key];
+
+        if(typeof value !== 'object') {
+            continue;
+        }
+
+        if(typeof value.nodeType !== 'undefined') {
+            return value;
+        }
+    }
+
+    return element;
 }
 
 var capture_events = [
@@ -39,6 +63,6 @@ window.gms_event = function(event) {
 
 window.onhashchange = function () {
     dispatchEvent('gm.showPanel', {
-        element: document.querySelector('#main')
+        element: getNode(document.querySelector('#main'))
     });
 };
