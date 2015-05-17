@@ -66,6 +66,11 @@
                     return;
                 }
 
+                if(Object.keys(player).length > 15) {
+                    console.warn('GMS-PS - Called with "player" in an invalid state');
+                    return;
+                }
+
                 var track = parameters[0].track;
 
                 if(this.interop.ps.getTrackInfo === null) {
