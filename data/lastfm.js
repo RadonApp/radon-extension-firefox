@@ -20,7 +20,8 @@ var LFM = (function() {
     }
 
     function call(method, callback, parameters, write) {
-        console.log('[call] method: ' + method);
+        console.log('LFM.call - method: "' + method + '", parameters:', parameters);
+
         parameters = parameters || {};
         write = typeof write != 'undefined' ? write : true;
 
@@ -63,41 +64,58 @@ var LFM = (function() {
 })();
 
 LFM.track = {
-    updateNowPlaying: function(track) {
-        if(LFM.session === null || track === null) {
+    updateNowPlaying: function(current) {
+        var params = this._buildParams(current);
+
+        if(params === null) {
+            // Unable to build parameters (invalid track or session)
             return;
         }
 
-        var params = {
-            sk: LFM.session.key,
-            track: track.title,
-            artist: track.artist,
-            album: track.album,
-            duration: Math.floor(track.durationMillis / 1000)
-        };
-
+        // Call `track.updateNowPlaying` at last.fm
         LFM.call('track.updateNowPlaying', function(result) {
-            console.log(result);
+            console.log('LFM.track.updateNowPlaying - response:', result);
         }, params);
     },
-    scrobble: function(track, timestamp) {
-        if(LFM.session === null || track === null) {
+    scrobble: function(current, timestamp) {
+        var params = this._buildParams(current);
+
+        if(params === null) {
+            // Unable to build parameters (invalid track or session)
             return;
         }
 
-        var params = {
-            sk: LFM.session.key,
-            track: track.title,
-            artist: track.artist,
-            album: track.album,
-            duration: Math.floor(track.durationMillis / 1000),
+        params.timestamp = timestamp;
 
-            timestamp: timestamp
+        // Call `track.scrobble` at last.fm
+        LFM.call('track.scrobble', function(result) {
+            console.log('LFM.track.scrobble - response:', result);
+        }, params);
+    },
+    _buildParams: function(current) {
+        if(LFM.session === null || current === null) {
+            return null;
+        }
+
+        var result = {
+            sk: LFM.session.key,
+
+            // Track details
+            track:          current.track,
+            artist:         current.artist,
+
+            album:          current.album,
+
+            duration:       current.duration,
+            trackNumber:    current.trackNumber
         };
 
-        LFM.call('track.scrobble', function(result) {
-            console.log(result);
-        }, params);
+        // Only add `albumArtist` parameter if it exists
+        if(typeof current.albumArtist !== 'undefined') {
+            result.albumArtist = current.albumArtist;
+        }
+
+        return result;
     }
 };
 
