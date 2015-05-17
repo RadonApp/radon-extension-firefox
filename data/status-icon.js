@@ -131,7 +131,7 @@ GMS.StatusIcon = (function() {
         data = _data;
         remind = storage.setup_remind === true || storage.setup_remind === undefined;
 
-        document.addEventListener('gm.pageLoaded', function(event) {
+        document.addEventListener('gms.ev1.pageLoaded', function(event) {
             construct();
 
             if(LFM.session === null && remind === true) {

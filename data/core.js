@@ -88,42 +88,6 @@ var GMS = (function(port) {
     };
 })(self.port);
 
-GMS.SliderMonitor = (function() {
-    this.eventPrefix = 'GMS.SliderMonitor';
-    this.ownerDocument = document;
-
-    var sliderMin = null,
-        sliderMax = null;
-
-    function change(event) {
-        if(event.attribute == 'aria-valuenow') {
-            EventHelper.trigger(GMS.SliderMonitor, 'positionChange', [sliderMin, sliderMax, event.value]);
-        } else if(event.attribute == 'aria-valuemin') {
-            sliderMin = event.value;
-        } else if(event.attribute == 'aria-valuemax') {
-            sliderMax = event.value;
-            EventHelper.trigger(GMS.SliderMonitor, 'maxChange', [sliderMax]);
-        }
-    }
-
-    document.addEventListener('gm.pageLoaded', function() {
-        $('#material-player-progress').attrmonitor({
-            attributes: ['aria-valuenow', 'aria-valuemin', 'aria-valuemax'],
-            interval: 1000,
-            start: true,
-            callback: change
-        });
-    });
-
-    return {
-        $object: $(this),
-
-        bind: function(eventType, eventData, handler) {
-            EventHelper.bind(GMS.SliderMonitor, eventType, eventData, handler);
-        }
-    };
-})();
-
 GMS.Scrobbler = (function() {
     var current = null,
         playing = false,
@@ -138,51 +102,71 @@ GMS.Scrobbler = (function() {
         }
         playing = value;
 
-        console.log('setPlayingState, playing: ' + playing);
+        console.log('GMS.Scrobbler.setPlayingState', playing);
 
         if(playing === true) {
             LFM.track.updateNowPlaying(current);
         }
     }
 
-    GMS.SliderMonitor.bind('maxChange', function(event, max) {
-        current = null;
+    function setPlaying(track) {
+        console.log('GMS.Scrobbler.setPlaying', track);
+
+        current = track;
+        currentTimestamp = Math.round(new Date().getTime() / 1000);
+        currentSubmitted = false;
+
+        lastPosition = null;
+
+        // Update now playing status
+        setPlayingState(true);
+    }
+
+    document.addEventListener('gms.ps.playSong', function(ev) {
+        var track = ev.detail.track;
+
+        setPlaying(track);
     });
 
-    GMS.SliderMonitor.bind('positionChange', function(event, min, max, now) {
-        if(now <= 2000) {
-            current = null;
+    document.addEventListener('gms.ev2.timeUpdate', function(ev) {
+        var now = ev.detail.currentTime;
+
+        // Convert `now` to seconds
+        now = now / 1000;
+
+        // Ignore updates until we reach 2 seconds played
+        if(now <= 2) {
             return;
         }
 
         if(current !== null && lastPosition !== null) {
             var change = now - lastPosition,
                 span = (new Date().getTime()) - lastTimestamp,
-                diff = span - change;
+                diff = (span / 1000) - change;
 
-            if(diff > 10000) {
-                console.log('Song was probably paused, rebuilding state (to trigger now-playing update)');
-                current = null;
+            if(diff > 10) {
+                // 10 seconds since last update, re-send now playing status
+                console.log('GMS.Scrobbler - ' + diff.toFixed(2) + 's since last time update, updating now playing status');
+
+                // Update now playing status
+                setPlayingState(true);
             }
         }
 
         lastPosition = now;
         lastTimestamp = new Date().getTime();
 
-        if(current === null) {
-            updateCurrentMedia(max);
-        }
-
+        // Ignore already submitted tracks
         if(currentSubmitted) {
             return;
         }
 
         // Ignore songs shorter than 30 seconds
-        if(max < 30 * 1000) {
+        if(current.duration < 30) {
             return;
         }
 
-        var perc = now / max;
+        var perc = now / current.duration;
 
         // If over 50% played, submit it
         if(perc >= 0.50) {
@@ -190,31 +174,6 @@ GMS.Scrobbler = (function() {
             currentSubmitted = true;
         }
     });
-
-    function setPlaying(song) {
-        current = song;
-        currentTimestamp = Math.round(new Date().getTime() / 1000);
-        currentSubmitted = false;
-        lastPosition = null;
-
-        console.log('    title: ' + current.title);
-        console.log('    album: ' + current.album);
-        console.log('    artist: ' + current.artist);
-        console.log('    durationMillis: ' + current.durationMillis);
-
-        setPlayingState(true);
-    }
-
-    function updateCurrentMedia(durationMillis) {
-        var $playerSongInfo = $('#playerSongInfo');
-
-        setPlaying({
-            'title': $('#player-song-title', $playerSongInfo).text(),
-            'album': $('.player-album', $playerSongInfo).text(),
-            'artist': $('.player-artist', $playerSongInfo).text(),
-            'durationMillis': durationMillis
-        });
-    }
 
     return {};
 })();
