@@ -5,5 +5,5 @@
   "description": "Google Play Music last.fm scrobbler",
   "author": "Dean Gardiner",
   "license": "MPL 2.0",
-  "version": "0.8.0-beta"
+  "version": "0.8.1-dev"
 }
