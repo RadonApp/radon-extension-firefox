@@ -148,7 +148,7 @@
                     album:          info[4],
                     albumArtist:    info[5],
 
-                    duration:       info[13] / 1000,
+                    duration:       Math.floor(info[13] / 1000),
                     trackNumber:    info[14]
                 };
 
