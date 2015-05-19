@@ -1,3 +1,4 @@
 *.xpi
 /.idea
 *.iml
+/.profile
