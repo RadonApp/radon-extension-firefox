@@ -136,7 +136,7 @@
                 return element;
             },
             parseTrack: function(info) {
-                if(info == null || info.length !== 60) {
+                if(info == null || info.length < 60) {
                     // Invalid track info format
                     return null;
                 }
