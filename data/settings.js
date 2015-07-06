@@ -3,14 +3,19 @@
 //
 
 GMS.AuthorizationSettings = (function() {
-    var $authorizationButton = null,
-        $authorizationStatus = null,
+    var $button = null,
+        $buttonContent = null,
+        $status = null,
         currentToken = null;
 
-    var $section = $(
-        '<div class="lastfm-action-section">' +
-            '<button id="authorization" class="button" data-state="link">Link Account</button>' +
-            '<span id="authorization-status"></span>' +
+    var $container = $(
+        '<div id="gms-actions">' +
+            '<sj-paper-button role="button" class="material-primary" data-state="link">' +
+                '<div class="button-content" relative="" layout="" horizontal="" center-center="">' +
+                    'Link Account' +
+                '</div>' +
+            '</sj-paper-button>' +
+            '<span class="status"></span>' +
         '</div>'
     );
 
@@ -19,19 +24,19 @@ GMS.AuthorizationSettings = (function() {
         textColor = textColor !== undefined ? textColor : '#AAAAAA';
         disabled = disabled !== undefined ? disabled : false;
 
-        $authorizationStatus.html(status);
-        $authorizationStatus.css('color', textColor);
-        $section.css('background-color', backgroundColor);
+        $status.html(status);
+        $status.css('color', textColor);
+        $container.css('background-color', backgroundColor);
 
         if(disabled) {
-            $authorizationButton.attr('disabled', 'disabled');
+            $buttonContent.attr('disabled', 'disabled');
         } else {
-            $authorizationButton.removeAttr('disabled');
+            $buttonContent.removeAttr('disabled');
         }
     }
 
     function setState(state, error) {
-        $authorizationButton.attr('data-state', state);
+        $button.attr('data-state', state);
 
         if(state == 'unlink') {
             setStatus('Currently linked with account <b>' + LFM.session.name + '</b>');
@@ -42,21 +47,15 @@ GMS.AuthorizationSettings = (function() {
                 setStatus('');
             }
         } else if(state == 'confirm') {
-            setStatus('Linking <b>not finished yet</b>, Please confirm authorization.', '#FFF196', '#AAAAAA');
+            setStatus('Linking <b>not finished yet</b>, please confirm the link.', '#FFF196', '#AAAAAA');
         }
 
         if(state == 'unlink') {
-            $authorizationButton
-                .text('Unlink Account')
-                .removeClass('primary');
+            $buttonContent.text('Unlink Account');
         } else if(state == 'link') {
-            $authorizationButton
-                .text('Link Account')
-                .removeClass('primary');
+            $buttonContent.text('Link Account');
         } else if(state == 'confirm') {
-            $authorizationButton
-                .text('Confirm Link')
-                .addClass('primary');
+            $buttonContent.text('Confirm Link');
         }
     }
 
@@ -112,79 +111,92 @@ GMS.AuthorizationSettings = (function() {
     }
 
     return {
-        construct: function($options) {
-            $options.append($section);
+        construct: function($card) {
+            $card.prepend($container);
 
-            $authorizationButton = $('button#authorization', $section);
-            $authorizationStatus = $('span#authorization-status', $section);
+            $button = $('sj-paper-button', $container);
+            $buttonContent = $('.button-content', $button);
+
+            $status = $('.status', $container);
 
             // Update element state if we have an existing session
             if(LFM.session !== null) {
                 setState('unlink');
             }
 
-            $authorizationButton.unbind('click').bind('click', authorizationClick);
+            $button.unbind('click').bind('click', authorizationClick);
         }
     };
 })();
 
 GMS.MiscSettings = (function() {
-    var $section = null;
+    function checkbox_change($checkbox) {
+        var $label = $checkbox.parents('core-label');
 
-    function checkbox_change(event) {
-        var $control = $('#' + event.data.id, $section);
-
-        GMS.setOption(event.data.key, $control.prop('checked'));
+        GMS.setOption($label.attr('data-key'), $checkbox.hasClass('checked'));
     }
 
-    function create_checkbox(key, id, label) {
+    function create_checkbox($card, key, id, label) {
+        if($('#gms-' + id + '-label').length > 0) {
+            // checkbox already exists
+            return;
+        }
+
         var $control = $(
-            '<div class="lastfm-control" key="' + key + '">' +
-                '<input id="' + id + '" type="checkbox">' +
-                '<label for="' + id + '">' + label + '</label>' +
+            '<core-label center="" horizontal="" layout="" id="gms-' + id + '-label" data-key="' + key + '">' +
+                '<paper-checkbox tabindex="0" aria-checked="false" role="checkbox" id="gms-' + id + '-checkbox" aria-labelledby="gms-' + id + '-label">' +
+                    '<div id="checkboxContainer" class="">' +
+                        '<div id="checkbox"><div id="checkmark" class=""></div></div>' +
+                    '</div>' +
+                    '<div id="checkboxLabel" hidden=""></div>' +
+                '</paper-checkbox>' +
+                '<div flex="">' + label + '</div>' +
             '</div>'
         );
 
+        var $paperCheckbox = $('paper-checkbox', $control),
+            $checkbox = $('#checkbox', $control);
+
         if(GMS.getOption(key) === true) {
-            $('input[type="checkbox"]', $control).prop('checked', true);
+            $checkbox.addClass('checked');
         }
 
-        $control.change({
-            key: key,
-            id: id
-        }, checkbox_change);
+        $paperCheckbox.click(function() {
+            if($checkbox.hasClass('checked')) {
+                $checkbox.removeClass('checked');
+            } else {
+                $checkbox.addClass('checked');
+            }
 
-        $section.append($control);
+            checkbox_change($checkbox);
+        });
+
+        $card.append($control);
         return $control;
     }
 
     return {
-        construct: function($options) {
-            $section = $('<div class="lastfm-misc-section"></div>');
-
-            create_checkbox('display_icon', 'lastfm-display-icon', 'Display status icon');
-
-            $options.append($section);
+        construct: function($card) {
+            create_checkbox($card, 'display_icon', 'status-icon', 'Display status icon');
         }
     };
 })();
 
 GMS.Settings = (function() {
-    var $header = $(
-        '<div class="settings-cluster">' +
-            '<div class="header">' +
-                '<div class="title">Google Music Scrobbler</div>' +
-            '</div>' +
+    var $card = $(
+        '<div class="gms-settings-card settings-card material-shadow-z1">' +
+            '<h1 class="settings-card-title">Google Music Scrobbler</h1>' +
+            '<div class="controls"></div>' +
         '</div>'
     );
 
     var $options = null;
 
     function construct(panel, retry_num) {
-        var headers = $('.settings-cluster', panel);
+        var $cards = $('.material-settings-view .settings-card', panel);
 
         // Settings haven't finished loading, retry in 200ms
-        if(headers.length === 0) {
+        if($cards.length === 0) {
             if(retry_num === undefined) {
                 retry_num = 0;
             }
@@ -196,27 +208,27 @@ GMS.Settings = (function() {
 
             console.log("settings haven't finished loading, retry #" + retry_num);
             setTimeout(function() { construct(panel, retry_num + 1); }, 200);
+            return;
         }
 
         // Insert our settings just before the last header (Manage My Devices)
-        $header.insertBefore(headers[headers.length - 1]);
+        $card.insertAfter($cards[1]);
 
-        $options = $('<div class="settings-section-content" style="padding-top: 5px;"></div>');
-        $options.insertAfter($header);
+        var $controls = $('.controls', $card);
 
-        GMS.AuthorizationSettings.construct($options);
-        GMS.MiscSettings.construct($options);
+        GMS.AuthorizationSettings.construct($controls);
+        GMS.MiscSettings.construct($controls);
     }
 
     // Construct when the settings panel is opened
-    document.documentElement.addEventListener('gm.showPanel', function(event) {
+    document.addEventListener('gms.ev1.showPanel', function(event) {
         var elem = event.detail.element;
 
         if(elem === undefined) {
             return;
         }
 
-        if(elem.baseURI.endsWith('#/settings')) {
+        if(elem.baseURI.endsWith('#/accountsettings')) {
             construct($(elem));
         }
     });
