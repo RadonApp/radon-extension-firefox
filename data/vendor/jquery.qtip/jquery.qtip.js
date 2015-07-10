@@ -1244,7 +1244,9 @@ PROTOTYPE._setWidget = function()
 	// Start show timer
 	var callback = $.proxy(function(){ this.toggle(TRUE, event); }, this);
 	if(this.options.show.delay > 0) {
-		this.timers.show = setTimeout(callback, this.options.show.delay);
+		this.timers.show = setTimeout(function() {
+			callback();
+		}, this.options.show.delay);
 	}
 	else{ callback(); }
 }
@@ -1280,7 +1282,9 @@ function hideMethod(event) {
 	// If tooltip has displayed, start hide timer
 	var callback = $.proxy(function(){ this.toggle(FALSE, event); }, this);
 	if(this.options.hide.delay > 0) {
-		this.timers.hide = setTimeout(callback, this.options.hide.delay);
+		this.timers.hide = setTimeout(function() {
+			callback();
+		}, this.options.hide.delay);
 	}
 	else{ callback(); }
 }
@@ -1291,7 +1295,11 @@ function inactiveMethod(event) {
 	// Clear timer
 	clearTimeout(this.timers.inactive);
 	this.timers.inactive = setTimeout(
-		$.proxy(function(){ this.hide(event); }, this), this.options.hide.inactive
+		function() {
+			$.proxy(function () {
+				this.hide(event);
+			}, this)();
+		}, this.options.hide.inactive
 	);
 }
 
@@ -1754,7 +1762,9 @@ QTIP.bind = function(opts, event)
 			// Start the event sequence
 			if(options.show.delay > 0) {
 				clearTimeout(api.timers.show);
-				api.timers.show = setTimeout(render, options.show.delay);
+				api.timers.show = setTimeout(function() {
+					render();
+				}, options.show.delay);
 				if(events.show !== events.hide) {
 					targets.hide.bind(events.hide, function() { clearTimeout(api.timers.show); });
 				}
