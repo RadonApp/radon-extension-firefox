@@ -56,7 +56,7 @@
             ps: function(player, parameters) {
                 console.log('GMS-PS', player, parameters);
 
-                if(player == null) {
+                if(player === null) {
                     console.warn('GMS-PS - Called with invalid "player" parameter');
                     return;
                 }
@@ -82,11 +82,13 @@
 
                         if(Array.isArray(track[key])) {
                             // Found `trackInfo` array, build getter function
+                            /* jshint ignore:start */
                             this.interop.ps.getTrackInfo = (function(key) {
                                 return function(track) {
                                     return track[key];
                                 };
                             })(key);
+                            /* jshint ignore:end */
                             break;
                         }
                     }
@@ -136,7 +138,7 @@
                 return element;
             },
             parseTrack: function(info) {
-                if(info == null || info.length < 60) {
+                if(info === null || info.length < 60) {
                     // Invalid track info format
                     return null;
                 }
@@ -170,7 +172,7 @@
             } catch(error) {
                 console.warn('GMS - Exception raised in "%s" callback', name, error);
             }
-        }
+        };
     }
 
     hook('gms_ev1', GMS.on.ev1);
