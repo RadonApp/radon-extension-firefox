@@ -1,5 +1,6 @@
 GoogleMusicScrobbler
 ====================
+[![](https://img.shields.io/travis/fuzeman/GoogleMusicScrobbler.svg)](https://travis-ci.org/fuzeman/GoogleMusicScrobbler)
 
 Scrobble your tracks to Last.fm, straight from the Google Play Music player in Firefox!
 
