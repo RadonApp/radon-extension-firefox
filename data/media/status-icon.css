@@ -24,6 +24,10 @@ img#gms-icon {
     height: 18px;
 }
 
+.qtip {
+    max-width: 500px;
+}
+
 .qtip-content {
     padding: 13px;
 }
