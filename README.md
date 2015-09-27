@@ -19,4 +19,4 @@ This will open a Last.fm page asking for your permission to scrobble to your acc
 ![img](https://i.imgur.com/np46TWc.png)
 ![img](https://i.imgur.com/m5OySLZ.png)
 
-[1]: https://github.com/fuzeman/GoogleMusicScrobbler/releases/download/0.8.6.3-beta/google_music_scrobbler-0.8.6.3-beta-signed.xpi
+[1]: https://github.com/fuzeman/GoogleMusicScrobbler/releases/download/0.8.6.4-beta/google_music_scrobbler-0.8.6.4-beta-signed.xpi
