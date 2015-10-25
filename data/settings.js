@@ -4,17 +4,15 @@
 
 GMS.AuthorizationSettings = (function() {
     var $button = null,
-        $buttonContent = null,
+        $buttonText = null,
         $status = null,
         currentToken = null;
 
     var $container = $(
         '<div id="gms-actions">' +
-            '<sj-paper-button role="button" class="material-primary" data-state="link">' +
-                '<div class="button-content" relative="" layout="" horizontal="" center-center="">' +
-                    'Link Account' +
-                '</div>' +
-            '</sj-paper-button>' +
+            '<paper-button role="button" class="material-primary" data-state="link" raised="">' +
+                '<span class="text"></span>' +
+            '</paper-button>' +
             '<span class="status"></span>' +
         '</div>'
     );
@@ -29,9 +27,9 @@ GMS.AuthorizationSettings = (function() {
         $container.css('background-color', backgroundColor);
 
         if(disabled) {
-            $buttonContent.attr('disabled', 'disabled');
+            $button.attr('disabled', '');
         } else {
-            $buttonContent.removeAttr('disabled');
+            $button.removeAttr('disabled');
         }
     }
 
@@ -48,14 +46,6 @@ GMS.AuthorizationSettings = (function() {
             }
         } else if(state == 'confirm') {
             setStatus('Linking <b>not finished yet</b>, please confirm the link.', '#FFF196', '#AAAAAA');
-        }
-
-        if(state == 'unlink') {
-            $buttonContent.text('Unlink Account');
-        } else if(state == 'link') {
-            $buttonContent.text('Link Account');
-        } else if(state == 'confirm') {
-            $buttonContent.text('Confirm Link');
         }
     }
 
@@ -114,8 +104,8 @@ GMS.AuthorizationSettings = (function() {
         construct: function($card) {
             $card.prepend($container);
 
-            $button = $('sj-paper-button', $container);
-            $buttonContent = $('.button-content', $button);
+            $button = $('paper-button', $container);
+            $buttonText = $('paper-button .text', $button);
 
             $status = $('.status', $container);
 

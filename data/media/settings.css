@@ -4,11 +4,19 @@
     border-bottom-right-radius: 2px;
     border-top-right-radius: 2px;
 
-    margin-bottom: 10px;
+    margin: 12px 0;
 }
 
-    #gms-actions sj-paper-button {
-        margin-bottom: -5px;
+    #gms-actions paper-button[data-state="link"] .text::before {
+        content: 'Link Account';
+    }
+
+    #gms-actions paper-button[data-state="unlink"] .text::before {
+        content: 'Unlink Account';
+    }
+
+    #gms-actions paper-button[data-state="confirm"] .text::before {
+        content: 'Confirm Link';
     }
 
     #gms-actions .status {
@@ -16,12 +24,8 @@
         color: #AAAAAA;
 
         margin: 0 10px;
-        vertical-align: 7px;
+        vertical-align: 1px;
     }
-
-#gms-status-icon-label {
-    height: 34px;
-}
 
 #gms-status-icon-checkbox {
     margin-right: 16px;
