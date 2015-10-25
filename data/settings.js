@@ -121,37 +121,32 @@ GMS.AuthorizationSettings = (function() {
 
 GMS.MiscSettings = (function() {
     function checkbox_change($checkbox) {
-        var $label = $checkbox.parents('core-label');
+        var key = $checkbox.attr('data-key'),
+            checked = $checkbox.hasClass('checked');
 
-        GMS.setOption($label.attr('data-key'), $checkbox.hasClass('checked'));
+        GMS.setOption(key, checked);
+
+        console.log('Updated "' + key + '" option to: ' + checked);
     }
 
     function create_checkbox($card, key, id, label) {
-        if($('#gms-' + id + '-label').length > 0) {
+        if($('#gms-' + id + '-checkbox').length > 0) {
             // checkbox already exists
             return;
         }
 
-        var $control = $(
-            '<core-label center="" horizontal="" layout="" id="gms-' + id + '-label" data-key="' + key + '">' +
-                '<paper-checkbox tabindex="0" aria-checked="false" role="checkbox" id="gms-' + id + '-checkbox" aria-labelledby="gms-' + id + '-label">' +
-                    '<div id="checkboxContainer" class="">' +
-                        '<div id="checkbox"><div id="checkmark" class=""></div></div>' +
-                    '</div>' +
-                    '<div id="checkboxLabel" hidden=""></div>' +
-                '</paper-checkbox>' +
-                '<div flex="">' + label + '</div>' +
-            '</div>'
+        var $checkbox = $(
+            '<paper-checkbox tabindex="0" role="checkbox" id="gms-' + id + '-checkbox" data-key="' + key + '">' +
+                label +
+            '</paper-checkbox>'
         );
 
-        var $paperCheckbox = $('paper-checkbox', $control),
-            $checkbox = $('#checkbox', $control);
-
         if(GMS.getOption(key) === true) {
-            $checkbox.addClass('checked');
+            $checkbox.addClass('checked')
+                     .attr('checked', '');
         }
 
-        $paperCheckbox.click(function() {
+        $checkbox.click(function() {
             if($checkbox.hasClass('checked')) {
                 $checkbox.removeClass('checked');
             } else {
@@ -161,8 +156,8 @@ GMS.MiscSettings = (function() {
             checkbox_change($checkbox);
         });
 
-        $card.append($control);
-        return $control;
+        $card.append($checkbox);
+        return $checkbox;
     }
 
     return {

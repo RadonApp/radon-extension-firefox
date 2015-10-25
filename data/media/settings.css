@@ -28,7 +28,9 @@
     }
 
 #gms-status-icon-checkbox {
-    margin-right: 16px;
+    width: 100%;
+
+    margin: 6px 0;
 }
 
 .qtip-fixed {
