@@ -126,11 +126,11 @@
 
                     var value = element[key];
 
-                    if(typeof value !== 'object') {
+                    if(typeof value !== 'object' || value === null) {
                         continue;
                     }
 
-                    if(typeof value.nodeType !== 'undefined') {
+                    if(typeof value.nodeType !== 'undefined' && value.nodeType !== null) {
                         return value;
                     }
                 }
