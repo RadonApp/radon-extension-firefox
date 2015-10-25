@@ -4,17 +4,15 @@
 
 GMS.AuthorizationSettings = (function() {
     var $button = null,
-        $buttonContent = null,
+        $buttonText = null,
         $status = null,
         currentToken = null;
 
     var $container = $(
         '<div id="gms-actions">' +
-            '<sj-paper-button role="button" class="material-primary" data-state="link">' +
-                '<div class="button-content" relative="" layout="" horizontal="" center-center="">' +
-                    'Link Account' +
-                '</div>' +
-            '</sj-paper-button>' +
+            '<paper-button role="button" class="material-primary" data-state="link" raised="">' +
+                '<span class="text"></span>' +
+            '</paper-button>' +
             '<span class="status"></span>' +
         '</div>'
     );
@@ -29,9 +27,9 @@ GMS.AuthorizationSettings = (function() {
         $container.css('background-color', backgroundColor);
 
         if(disabled) {
-            $buttonContent.attr('disabled', 'disabled');
+            $button.attr('disabled', '');
         } else {
-            $buttonContent.removeAttr('disabled');
+            $button.removeAttr('disabled');
         }
     }
 
@@ -48,14 +46,6 @@ GMS.AuthorizationSettings = (function() {
             }
         } else if(state == 'confirm') {
             setStatus('Linking <b>not finished yet</b>, please confirm the link.', '#FFF196', '#AAAAAA');
-        }
-
-        if(state == 'unlink') {
-            $buttonContent.text('Unlink Account');
-        } else if(state == 'link') {
-            $buttonContent.text('Link Account');
-        } else if(state == 'confirm') {
-            $buttonContent.text('Confirm Link');
         }
     }
 
@@ -114,8 +104,8 @@ GMS.AuthorizationSettings = (function() {
         construct: function($card) {
             $card.prepend($container);
 
-            $button = $('sj-paper-button', $container);
-            $buttonContent = $('.button-content', $button);
+            $button = $('paper-button', $container);
+            $buttonText = $('paper-button .text', $button);
 
             $status = $('.status', $container);
 
@@ -131,37 +121,32 @@ GMS.AuthorizationSettings = (function() {
 
 GMS.MiscSettings = (function() {
     function checkbox_change($checkbox) {
-        var $label = $checkbox.parents('core-label');
+        var key = $checkbox.attr('data-key'),
+            checked = $checkbox.hasClass('checked');
 
-        GMS.setOption($label.attr('data-key'), $checkbox.hasClass('checked'));
+        GMS.setOption(key, checked);
+
+        console.log('Updated "' + key + '" option to: ' + checked);
     }
 
     function create_checkbox($card, key, id, label) {
-        if($('#gms-' + id + '-label').length > 0) {
+        if($('#gms-' + id + '-checkbox').length > 0) {
             // checkbox already exists
             return;
         }
 
-        var $control = $(
-            '<core-label center="" horizontal="" layout="" id="gms-' + id + '-label" data-key="' + key + '">' +
-                '<paper-checkbox tabindex="0" aria-checked="false" role="checkbox" id="gms-' + id + '-checkbox" aria-labelledby="gms-' + id + '-label">' +
-                    '<div id="checkboxContainer" class="">' +
-                        '<div id="checkbox"><div id="checkmark" class=""></div></div>' +
-                    '</div>' +
-                    '<div id="checkboxLabel" hidden=""></div>' +
-                '</paper-checkbox>' +
-                '<div flex="">' + label + '</div>' +
-            '</div>'
+        var $checkbox = $(
+            '<paper-checkbox tabindex="0" role="checkbox" id="gms-' + id + '-checkbox" data-key="' + key + '">' +
+                label +
+            '</paper-checkbox>'
         );
 
-        var $paperCheckbox = $('paper-checkbox', $control),
-            $checkbox = $('#checkbox', $control);
-
         if(GMS.getOption(key) === true) {
-            $checkbox.addClass('checked');
+            $checkbox.addClass('checked')
+                     .attr('checked', '');
         }
 
-        $paperCheckbox.click(function() {
+        $checkbox.click(function() {
             if($checkbox.hasClass('checked')) {
                 $checkbox.removeClass('checked');
             } else {
@@ -171,8 +156,8 @@ GMS.MiscSettings = (function() {
             checkbox_change($checkbox);
         });
 
-        $card.append($control);
-        return $control;
+        $card.append($checkbox);
+        return $checkbox;
     }
 
     return {
