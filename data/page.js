@@ -12,11 +12,6 @@
             player: null,
             track: null
         },
-        interop: {
-            ps: {
-                getTrackInfo: null
-            }
-        },
         event: {
             fire: function(name, detail) {
                 //console.log('GMS.event.fire', name, detail);
@@ -37,7 +32,7 @@
                 // trigger initial 'gm.showPanel' event
                 if(event.eventName == 'pageLoaded') {
                     this.event.fire('gms.ev1.showPanel', {
-                        element: this.utils.getNode(document.querySelector('#main'))
+                        element: GMS.utils.getNode(document.querySelector('#main'))
                     });
                 }
             },
@@ -61,51 +56,24 @@
                     return;
                 }
 
-                if(parameters.length !== 4 || typeof parameters[0].track === 'undefined') {
-                    console.warn('GMS-PS - Called with invalid "parameters" parameter');
+                if(parameters.length !== 4 || typeof parameters[0] !== 'object') {
+                    console.warn('GMS-PS - Called with invalid parameters');
                     return;
                 }
 
-                if(Object.keys(player).length > 15) {
-                    console.warn('GMS-PS - Called with "player" in an invalid state');
+                // Find track info in parameters
+                var track = GMS.utils.findTrack(parameters[0]);
+
+                if(typeof track === 'undefined' || track === null) {
+                    console.warn('GMS-PS - Unable to find track info');
                     return;
-                }
-
-                var track = parameters[0].track;
-
-                if(this.interop.ps.getTrackInfo === null) {
-                    // Search for `trackInfo` attribute
-                    for(var key in track) {
-                        if(!track.hasOwnProperty(key)) {
-                            continue;
-                        }
-
-                        if(Array.isArray(track[key])) {
-                            // Found `trackInfo` array, build getter function
-                            /* jshint ignore:start */
-                            this.interop.ps.getTrackInfo = (function(key) {
-                                return function(track) {
-                                    return track[key];
-                                };
-                            })(key);
-                            /* jshint ignore:end */
-                            break;
-                        }
-                    }
-
-                    if(this.interop.ps.getTrackInfo === null) {
-                        console.warn('GMS-PS - Unable to find track info array');
-                        return;
-                    }
                 }
 
                 // Store current `player` object
                 this.current.player = player;
 
                 // Retrieve track details
-                this.current.track = this.utils.parseTrack(
-                    this.interop.ps.getTrackInfo(track)
-                );
+                this.current.track = GMS.utils.parseTrack(track);
 
                 // Fire `playSong` event
                 this.event.fire('gms.ps.playSong', {
@@ -136,6 +104,50 @@
                 }
 
                 return element;
+            },
+            findTrack: function(data, depth) {
+                // Set default `depth`
+                if(typeof depth === 'undefined' || depth === null) {
+                    depth = 0;
+                }
+
+                // Limit findTrack() `depth` to 5
+                if(depth >= 5) {
+                    return null;
+                }
+
+                var children = [];
+
+                // Try find track in `data`
+                for(var key in data) {
+                    if(!data.hasOwnProperty(key)) {
+                        continue;
+                    }
+
+                    var value = data[key];
+
+                    if(Array.isArray(value)) {
+                        // Only return if the array has over 50 items
+                        if(value.length >= 50) {
+                            return value;
+                        }
+                    } else if(value !== null && typeof value === 'object') {
+                        // Store object for further searching
+                        children.push(value);
+                    }
+                }
+
+                // Search children for track
+                for(var i = 0; i < children.length; ++i) {
+                    var child = children[i],
+                        result = GMS.utils.findTrack(child, depth + 1);
+
+                    if(typeof result !== 'undefined' && result !== null) {
+                        return result;
+                    }
+                }
+
+                return null;
             },
             parseTrack: function(info) {
                 if(info === null || info.length < 60) {
