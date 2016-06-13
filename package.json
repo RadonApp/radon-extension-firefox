@@ -1,9 +1,11 @@
 {
   "name": "gmusicscrobbler",
-  "fullName": "Google Music Scrobbler",
-  "id": "jid1-rbAJu4BHjMqTww",
+  "title": "Google Music Scrobbler",
+  "id": "jid1-rbAJu4BHjMqTww@jetpack",
   "description": "Google Play Music last.fm scrobbler",
   "author": "Dean Gardiner",
   "license": "MPL 2.0",
   "version": "0.8.6.8-beta"
+
+  "main": "lib/main.js"
 }
