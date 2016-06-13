@@ -29,19 +29,28 @@ img#gms-icon {
 }
 
 .qtip-content {
-    padding: 13px;
+    padding: 10px 15px;
 }
 
-#gms-popup-setup p {
+.gms-popup h2, .gms-popup p {
     font-size: 15px;
-    line-height: 18px;
+    line-height: 20px;
+}
+
+.gms-popup h2 {
+    margin: 0 0 15px;
+    padding: 0;
+}
+
+.gms-popup p {
     margin: 0;
+    padding: 0;
 }
 
-#gms-popup-setup .actions {
-    margin-top: 10px;
+.gms-popup .actions {
+    margin-top: 15px;
 }
 
-#gms-popup-setup .actions button:last-child {
+.gms-popup .actions button:last-child {
     margin-right: 0;
 }

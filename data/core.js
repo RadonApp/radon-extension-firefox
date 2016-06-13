@@ -105,7 +105,12 @@ GMS.Scrobbler = (function() {
         console.log('GMS.Scrobbler.setPlayingState', playing);
 
         if(playing === true) {
-            LFM.track.updateNowPlaying(current);
+            LFM.track.updateNowPlaying(current, function() {
+                console.log('Status updated');
+            }, function(status, data) {
+                console.log('Unable to update status', data);
+                processError(status, data);
+            });
         }
     }
 
@@ -170,10 +175,28 @@ GMS.Scrobbler = (function() {
 
         // If over 50% played, submit it
         if(perc >= 0.50) {
-            LFM.track.scrobble(current, currentTimestamp);
+            LFM.track.scrobble(current, currentTimestamp, function() {
+                console.log('Track scrobbled');
+            }, function(status, data) {
+                console.log('Unable to scrobble track', data);
+                processError(status, data);
+            });
             currentSubmitted = true;
         }
     });
+
+    function processError(status, data) {
+        if(typeof data === 'undefined' || data == null) {
+            EventHelper.trigger(GMS, 'lfm.error', [status, 'Unknown (' + status + ')']);
+            return;
+        }
+
+        if(data.error === 9) {
+            EventHelper.trigger(GMS, 'lfm.expired', [data.message]);
+        } else {
+            EventHelper.trigger(GMS, 'lfm.error', [data.error, data.message]);
+        }
+    }
 
     return {};
 })();

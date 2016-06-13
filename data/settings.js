@@ -115,7 +115,11 @@ GMS.AuthorizationSettings = (function() {
             }
 
             $button.unbind('click').bind('click', authorizationClick);
-        }
+        },
+
+        link: link,
+        unlink: unlink,
+        confirm: confirm
     };
 })();
 
@@ -168,6 +172,8 @@ GMS.MiscSettings = (function() {
 })();
 
 GMS.Settings = (function() {
+    var callback = null;
+
     var $card = $(
         '<div class="gms-settings-card settings-card material-shadow-z1">' +
             '<h2 class="settings-card-title">Google Music Scrobbler</h2>' +
@@ -207,6 +213,10 @@ GMS.Settings = (function() {
 
         GMS.AuthorizationSettings.construct($controls);
         GMS.MiscSettings.construct($controls);
+
+        if(callback !== null) {
+            callback();
+        }
     }
 
     // Construct when the settings panel is opened
@@ -225,4 +235,19 @@ GMS.Settings = (function() {
             }
         }
     });
+
+    return {
+        refreshAuthorization: function() {
+            callback = function() {
+                // Start re-authentication process
+                GMS.AuthorizationSettings.link();
+
+                // Clear callback
+                callback = null;
+            };
+
+            // Load settings page
+            location.hash = '#/accountsettings';
+        }
+    }
 })();
