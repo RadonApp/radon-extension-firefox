@@ -170,15 +170,19 @@ GMS.MiscSettings = (function() {
 GMS.Settings = (function() {
     var $card = $(
         '<div class="gms-settings-card settings-card material-shadow-z1">' +
-            '<h1 class="settings-card-title">Google Music Scrobbler</h1>' +
+            '<h2 class="settings-card-title">Google Music Scrobbler</h2>' +
             '<div class="controls"></div>' +
         '</div>'
     );
 
     var $options = null;
 
-    function construct(panel, retry_num) {
-        var $cards = $('.material-settings-view .settings-card', panel);
+    function construct(retry_num) {
+        // Retrieve settings panel
+        var panel = document.getElementById("mainPanel");
+
+        // Find setting cards
+        var $cards = $(".material-settings-view .settings-card", panel);
 
         // Settings haven't finished loading, retry in 200ms
         if($cards.length === 0) {
@@ -191,8 +195,8 @@ GMS.Settings = (function() {
                 return;
             }
 
-            console.log("settings haven't finished loading, retry #" + retry_num);
-            setTimeout(function() { construct(panel, retry_num + 1); }, 200);
+            console.log("Settings haven't finished loading, retry #" + retry_num);
+            setTimeout(function() { construct(retry_num + 1); }, 200);
             return;
         }
 
@@ -214,7 +218,11 @@ GMS.Settings = (function() {
         }
 
         if(elem.baseURI.endsWith('#/accountsettings')) {
-            construct($(elem));
+            try {
+                construct();
+            } catch(ex) {
+                console.log("Unable to construct settings", ex.stack, ex.message);
+            }
         }
     });
 })();
