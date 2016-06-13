@@ -7,6 +7,8 @@
         'pageLoaded'
     ];
 
+    var pageLoaded = false;
+
     var GMS = {
         current: {
             player: null,
@@ -31,6 +33,7 @@
 
                 // trigger initial 'gm.showPanel' event
                 if(event.eventName == 'pageLoaded') {
+                    // Fire initial "showPanel" event
                     this.event.fire('gms.ev1.showPanel', {
                         element: GMS.utils.getNode(document.querySelector('#main'))
                     });
@@ -46,6 +49,12 @@
                     this.event.fire('gms.ev2.timeUpdate', {
                         currentTime: this.current.player.getCurrentTime()
                     });
+                } else if(event === 'ready' && !pageLoaded) {
+                    pageLoaded = true;
+
+                    GMS.on.ev1.apply(GMS, [{
+                        eventName: 'pageLoaded'
+                    }]);
                 }
             },
             ps: function(player, parameters) {

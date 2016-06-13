@@ -19,39 +19,53 @@ var LFM = (function() {
         return CryptoJS.MD5(sig).toString(CryptoJS.enc.Hex);
     }
 
-    function call(method, callback, parameters, write) {
-        console.log('LFM.call - method: "' + method + '", parameters:', parameters);
+    function call(method, args) {
+        console.log('LFM.call - method: "' + method + '", args:', args);
 
-        parameters = parameters || {};
-        write = typeof write != 'undefined' ? write : true;
+        args = args || {};
 
-        parameters.method = method;
-        parameters.api_key = apiKey;
-        parameters.format = 'json';
+        args.parameters = args.parameters || {};
+        args.write = typeof args.write != 'undefined' ? args.write : true;
 
-        parameters.api_sig = createSignature(parameters);
+        args.parameters.method = method;
+        args.parameters.api_key = apiKey;
+        args.parameters.format = 'json';
+
+        args.parameters.api_sig = createSignature(args.parameters);
 
         var request = null;
 
-        if(write) {
+        if(args.write) {
             request = $.ajax(apiBase, {
                 type: 'POST',
-                data: parameters
+                data: args.parameters
             });
         } else {
             var paramString = "";
-            Object.keys(parameters).forEach(function(key) {
-                paramString += key + '=' + parameters[key] + '&';
+            Object.keys(args.parameters).forEach(function(key) {
+                paramString += key + '=' + args.parameters[key] + '&';
             });
             paramString = paramString.substring(0, paramString.length - 2);
 
             request = $.ajax(apiBase + '?' + paramString);
         }
 
-        request.done(callback);
+        request.done(function(data, status) {
+            // Fire `onSuccess` callback
+            if(typeof args.onSuccess != 'undefined' && args.onSuccess !== null) {
+                args.onSuccess(status, data);
+            }
+        });
 
         request.fail(function(jqxhr, status) {
-            console.log('[call] failed: ' + status);
+            var data = jqxhr.responseJSON;
+
+            console.log('[call] failed: ' + status, data);
+
+            // Fire `onError` callback
+            if(typeof args.onError != 'undefined' && args.onError !== null) {
+                args.onError(status, data);
+            }
         });
     }
 
@@ -64,7 +78,7 @@ var LFM = (function() {
 })();
 
 LFM.track = {
-    updateNowPlaying: function(current) {
+    updateNowPlaying: function(current, onSuccess, onError) {
         var params = this._buildParams(current);
 
         if(params === null) {
@@ -73,11 +87,14 @@ LFM.track = {
         }
 
         // Call `track.updateNowPlaying` at last.fm
-        LFM.call('track.updateNowPlaying', function(result) {
-            console.log('LFM.track.updateNowPlaying - response:', result);
-        }, params);
+        LFM.call('track.updateNowPlaying', {
+            parameters: params,
+
+            onSuccess: onSuccess,
+            onError: onError
+        });
     },
-    scrobble: function(current, timestamp) {
+    scrobble: function(current, timestamp, onSuccess, onError) {
         var params = this._buildParams(current);
 
         if(params === null) {
@@ -88,9 +105,12 @@ LFM.track = {
         params.timestamp = timestamp;
 
         // Call `track.scrobble` at last.fm
-        LFM.call('track.scrobble', function(result) {
-            console.log('LFM.track.scrobble - response:', result);
-        }, params);
+        LFM.call('track.scrobble', {
+            parameters: params,
+
+            onSuccess: onSuccess,
+            onError: onError
+        });
     },
     _buildParams: function(current) {
         if(LFM.session === null || current === null) {
@@ -121,21 +141,29 @@ LFM.track = {
 
 LFM.auth = {
     getToken: function(callback) {
-        LFM.call('auth.getToken', function(result) {
-            callback(result.token);
-        }, {}, false);
+        LFM.call('auth.getToken', {
+            write: false,
+
+            onSuccess: function(status, result) {
+                callback(result.token);
+            }
+        });
     },
     getSession: function(token, callback) {
-        LFM.call('auth.getSession', function(result) {
-            if(result.session !== undefined) {
-                LFM.session = result.session;
-            } else {
-                LFM.session = null;
-            }
+        LFM.call('auth.getSession', {
+            parameters: {
+                token: token
+            },
 
-            callback(result);
-        }, {
-            token: token
+            onSuccess: function(status, result) {
+                if(result.session !== undefined) {
+                    LFM.session = result.session;
+                } else {
+                    LFM.session = null;
+                }
+
+                callback(result);
+            }
         });
     }
 };
