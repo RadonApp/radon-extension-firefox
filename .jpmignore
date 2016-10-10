@@ -1,0 +1,10 @@
+*.iml
+*.yml
+
+/.git
+/.idea
+/.profile
+/releases
+
+/.gitignore
+/README.md
