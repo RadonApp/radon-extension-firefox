@@ -9,24 +9,38 @@ GMS.AuthorizationSettings = (function() {
         currentToken = null;
 
     var $container = $(
-        '<div id="gms-actions">' +
-            '<paper-button role="button" class="material-primary" data-state="link" raised="">' +
+        '<div id="gms-actions" data-state="link">' +
+            '<paper-button role="button" class="material-primary" raised="">' +
                 '<span class="text"></span>' +
             '</paper-button>' +
             '<span class="status"></span>' +
         '</div>'
     );
 
-    function setStatus(status, backgroundColor, textColor, disabled) {
-        backgroundColor = backgroundColor !== undefined ? backgroundColor : '';
-        textColor = textColor !== undefined ? textColor : '#AAAAAA';
-        disabled = disabled !== undefined ? disabled : false;
+    function setStatus(status, options) {
+        options = typeof options !== 'undefined' ? options : {};
+        options.backgroundColor = typeof options.backgroundColor !== 'undefined' ? options.backgroundColor : '';
+        options.textColor = typeof options.textColor !== 'undefined' ? options.textColor : '#AAAAAA';
+        options.disabled = typeof options.disabled !== 'undefined' ? options.disabled : false;
+        options.flat = typeof options.flat !== 'undefined' ? options.flat : false;
 
         $status.html(status);
-        $status.css('color', textColor);
-        $container.css('background-color', backgroundColor);
+        $status.css('color', options.textColor);
+        $container.css('background-color', options.backgroundColor);
 
-        if(disabled) {
+        if(typeof status !== 'undefined' && status.length > 0) {
+            $container.addClass('has-status');
+        } else {
+            $container.removeClass('has-status');
+        }
+
+        if(options.flat) {
+            $container.addClass('flat');
+        } else {
+            $container.removeClass('flat');
+        }
+
+        if(options.disabled) {
             $button.attr('disabled', '');
         } else {
             $button.removeAttr('disabled');
@@ -34,18 +48,29 @@ GMS.AuthorizationSettings = (function() {
     }
 
     function setState(state, error) {
-        $button.attr('data-state', state);
+        // Set state
+        $container.attr('data-state', state);
 
+        // Update status
         if(state == 'unlink') {
-            setStatus('Currently linked with account <b>' + LFM.session.name + '</b>');
+            setStatus('Currently linked with account <b>' + LFM.session.name + '</b>', {
+                textColor: '#999',
+                flat: true
+            });
         } else if(state == 'link') {
-            if(error !== undefined) {
-                setStatus(error, '#E86B6B', '#E8E8E8');
+            if(typeof error !== 'undefined') {
+                setStatus(error, {
+                    backgroundColor: '#FF9B9B',
+                    textColor: '#666'
+                });
             } else {
                 setStatus('');
             }
         } else if(state == 'confirm') {
-            setStatus('Linking <b>not finished yet</b>, please confirm the link.', '#FFF196', '#AAAAAA');
+            setStatus('Linking <b>not finished yet</b>, please confirm the link.', {
+                backgroundColor: '#FFF196',
+                textColor: '#888'
+            });
         }
     }
 
@@ -72,7 +97,9 @@ GMS.AuthorizationSettings = (function() {
     }
 
     function confirm() {
-        setStatus('Checking authorization status...', undefined, undefined, true);
+        setStatus('Checking authorization status...', {
+            disabled: true
+        });
 
         // Validate session with last.fm and update UI with result
         LFM.auth.getSession(currentToken, function(result) {
@@ -100,7 +127,7 @@ GMS.AuthorizationSettings = (function() {
     function authorizationClick(event) {
         event.preventDefault();
 
-        var buttonState = $(this).attr('data-state');
+        var buttonState = $container.attr('data-state');
 
         if(buttonState == 'link') {
             link();
