@@ -78,10 +78,21 @@ GMS.AuthorizationSettings = (function() {
         LFM.auth.getSession(currentToken, function(result) {
             GMS.storeSession();
 
-            if(result.error === undefined) {
-                setState('unlink');
+            // Update interface
+            if(typeof result.error !== 'undefined') {
+                setState('link', result.message + ' (' + result.error + ')');
+                return;
+            }
+
+            setState('unlink');
+        }, function(result) {
+            GMS.storeSession();
+
+            // Update interface
+            if(typeof result.error !== 'undefined') {
+                setState('link', result.message + ' (' + result.error + ')');
             } else {
-                setState('link', 'Link error "' + result.message + '" (' + result.error + ')');
+                setState('link', 'Unknown Error');
             }
         });
     }

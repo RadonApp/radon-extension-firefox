@@ -149,20 +149,25 @@ LFM.auth = {
             }
         });
     },
-    getSession: function(token, callback) {
+    getSession: function(token, onSuccess, onError) {
         LFM.call('auth.getSession', {
             parameters: {
                 token: token
             },
 
             onSuccess: function(status, result) {
-                if(result.session !== undefined) {
+                if(typeof result.session !== 'undefined') {
                     LFM.session = result.session;
                 } else {
                     LFM.session = null;
                 }
 
-                callback(result);
+                onSuccess(result);
+            },
+            onError: function(status, result) {
+                LFM.session = null;
+
+                onError(result);
             }
         });
     }
