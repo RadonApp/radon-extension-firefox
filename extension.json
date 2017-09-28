@@ -1,0 +1,47 @@
+{
+  "name": "Neon",
+  "description": "Neon",
+
+  "applications": {
+    "gecko": {
+      "id": "jid1-rbAJu4BHjMqTww@jetpack",
+      "strict_min_version": "51.0a1"
+    }
+  },
+  "permissions": [
+    "webRequest"
+  ],
+
+  "background": {
+    "scripts": [
+      "common.js",
+      "background/common.js",
+
+      "background/messaging/messaging.js",
+      "background/messaging/services/storage.js",
+      "background/messaging/services/scrobble.js",
+
+      "background/callback/callback.js",
+      "background/main/main.js",
+      "background/migrate/migrate.js"
+    ]
+  },
+  "options_ui": {
+    "page": "configuration/configuration.html",
+    "browser_style": false,
+    "open_in_tab": true
+  },
+
+  "modules": {
+    "browsers": [
+      "neon-extension-browser-webextension",
+      "neon-extension-browser-firefox"
+    ],
+    "destinations": [
+      "neon-extension-destination-lastfm"
+    ],
+    "sources": [
+      "neon-extension-source-googlemusic"
+    ]
+  }
+}

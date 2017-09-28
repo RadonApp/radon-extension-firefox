@@ -1,0 +1,21 @@
+{
+  "id": "jid1-rbAJu4BHjMqTww@jetpack",
+  "version": "1.2.3-beta",
+  "main": "./main.js",
+  "name": "gmusicscrobbler",
+  "title": "Neon",
+  "description": "Neon",
+  "author": "Dean Gardiner",
+  "license": "MPL 2.0",
+
+  "hasEmbeddedWebExtension": true,
+
+  "engines": {
+    "firefox": ">= 51.0a1",
+    "fennec": ">= 51.0a1"
+  },
+
+  "permissions": {
+    "multiprocess": true
+  }
+}
