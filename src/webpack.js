@@ -505,8 +505,8 @@ function getServices(modules, type, options) {
     // Build service name
     let name = type.substring(type.indexOf('/') + 1);
 
-    // Find matching service entry points
-    let result = [];
+    // Find matching services
+    let items = [];
 
     for(let i = 0; i < modules.length; i++) {
         let module = modules[i];
@@ -521,30 +521,33 @@ function getServices(modules, type, options) {
             continue;
         }
 
-        // Ensure service exists
-        let servicePath = Path.resolve(module.path, 'src/services/' + name + '/index.js');
+        let servicePath = Path.resolve(module.path, 'src/services/' + name);
+        let serviceIndexPath = Path.resolve(servicePath, 'index.js');
 
-        if(!Filesystem.existsSync(servicePath)) {
-            GulpUtil.log(GulpUtil.colors.red(
-                'Ignoring service "%s" for module "%s", no file exists at: "%s"'
-            ), name, module.name, servicePath);
+        // Ensure service exists
+        if(!Filesystem.existsSync(serviceIndexPath)) {
+            GulpUtil.log(
+                GulpUtil.colors.red('Ignoring service "%s" for module "%s", no file exists at: "%s"'),
+                name, module.name, serviceIndexPath
+            );
             continue;
         }
 
-        // Build list of service modules
-        let items = [servicePath];
+        // Include service
+        items.push(serviceIndexPath);
 
-        // - Include react components (if enabled)
+        // Include react components (if enabled)
         if(options.includeComponents) {
-            let componentsPath = Path.resolve(module.path, 'services/' + name + '/components/index.js');
+            let componentsPath = Path.resolve(servicePath, 'components/index.js');
 
+            // Ensure service components exist
             if(Filesystem.existsSync(componentsPath)) {
                 items.push(componentsPath);
             }
         }
     }
 
-    return result;
+    return items;
 }
 
 // endregion
