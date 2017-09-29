@@ -8,6 +8,7 @@ import Webpack from 'webpack';
 
 import Base from './webpack.config';
 import Constants from './core/constants';
+import Extension from './core/extension';
 import Registry from './core/registry';
 import {getOutputDirectory} from './core/helpers';
 
@@ -168,6 +169,11 @@ export function buildConfiguration(environment, outputPath) {
             ...Base.plugins,
 
             new Webpack.DefinePlugin({
+                'neon.manifests': JSON.stringify({
+                    'neon-extension': Extension.metadata,
+                    ...Registry.getIndex(environment)
+                }),
+
                 'process.env': {
                     'NODE_ENV': JSON.stringify(environment)
                 }

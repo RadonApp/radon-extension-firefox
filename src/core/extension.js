@@ -2,14 +2,23 @@ import Filesystem from 'fs';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
 
-import Constants from '../core/constants';
+import Constants from './constants';
+import Git from './git';
 
 
 export class Extension {
     constructor() {
-        this._details = {};
-
+        this._dirty = {};
         this._fetched = false;
+        this._metadata = {};
+    }
+
+    get metadata() {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return this._metadata;
     }
 
     get manifest() {
@@ -17,15 +26,7 @@ export class Extension {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
-        return this._details.manifest;
-    }
-
-    get modules() {
-        if(!this._fetched) {
-            throw new Error('Extension manifest hasn\'t been fetched yet');
-        }
-
-        return this._details.modules;
+        return this._metadata.manifest;
     }
 
     get package() {
@@ -33,7 +34,15 @@ export class Extension {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
-        return this._details.package;
+        return this._metadata.package;
+    }
+
+    get modules() {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return this._metadata.modules;
     }
 
     get version() {
@@ -41,7 +50,45 @@ export class Extension {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
-        return this._details.version;
+        let version = this._metadata.version;
+
+        // Ensure "-dirty" suffix has been added
+        if(this.dirty && !version.endsWith('-dirty')) {
+            version += '-dirty';
+        }
+
+        return version;
+    }
+
+    isDirty(environment) {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        if(this._metadata.version.endsWith('-dirty')) {
+            return true;
+        }
+
+        return this._dirty[environment] || false;
+    }
+
+    setDirty(environment, value = true) {
+        this._dirty[environment] = value;
+    }
+
+    getVersion(environment) {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        let version = this._metadata.version;
+
+        // Ensure "-dirty" suffix has been added
+        if(this.isDirty(environment) && !version.endsWith('-dirty')) {
+            version += '-dirty';
+        }
+
+        return version;
     }
 
     fetch(options) {
@@ -55,26 +102,31 @@ export class Extension {
         }
 
         // Fetch extension details
-        return this._getDetails().then((details) => {
-            this._details = details;
+        return this._getMetadata().then((details) => {
+            this._metadata = details;
             this._fetched = true;
 
             return details;
         });
     }
 
-    _getDetails() {
-        return Promise.resolve()
-            // Retrieve module manifest
-            .then(() => this._getManifest({ required: false }))
-            // Retrieve module package details, and merge with manifest
-            .then((manifest) => this._getPackageDetails().then((data) => ({
-                name: data.name,
-                version: data.version,
+    _getMetadata() {
+        // Retrieve manifest
+        return this._getManifest({ required: false })
+            // Retrieve package details
+            .then((manifest) => this._getPackageDetails().then((details) => ({
+                name: details.name,
+                version: details.version,
                 ...manifest,
 
                 manifest: manifest,
-                package: data
+                package: details
+            })))
+            // Try retrieve extension version from git (or fallback to manifest version)
+            .then((metadata) => this._getRepositoryDetails(metadata.version).then((repository) => ({
+                ...metadata,
+
+                version: repository.version || metadata.version
             })));
     }
 
@@ -146,6 +198,14 @@ export class Extension {
                 }
             });
         });
+    }
+
+    _getRepositoryDetails(packageVersion) {
+        return Git.version(Constants.PackagePath, packageVersion).then((version) => ({
+            version
+        }), () => ({
+            version: null
+        }));
     }
 
     _parseManifest(contents) {

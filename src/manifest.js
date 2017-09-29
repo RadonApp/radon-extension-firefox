@@ -17,7 +17,7 @@ export function build(environment) {
 
     // Build manifest from modules
     return buildModuleManifests(environment)
-        .then((manifests) => buildManifest(manifests))
+        .then((manifests) => buildManifest(environment, manifests))
         .then((manifest) => writeManifest(environment, manifest));
 }
 
@@ -27,7 +27,7 @@ function buildModuleManifests(environment) {
     }));
 }
 
-function getExtensionManifest() {
+function getExtensionManifest(environment) {
     let permissions = [
         ...Extension.manifest.origins,
         ...Extension.manifest.permissions
@@ -42,7 +42,7 @@ function getExtensionManifest() {
         manifest_version: 2,
 
         name: null,
-        version: Extension.version,
+        version: Extension.getVersion(environment),
 
         description: null,
         icons: {},
@@ -103,8 +103,8 @@ function getModuleManifest(module) {
     };
 }
 
-function buildManifest(manifests) {
-    let result = CloneDeep(getExtensionManifest());
+function buildManifest(environment, manifests) {
+    let result = CloneDeep(getExtensionManifest(environment));
 
     for(let i = 0; i < manifests.length; i++) {
         let manifest = manifests[i];

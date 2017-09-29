@@ -6,8 +6,9 @@ import PadEnd from 'lodash-es/padEnd';
 import Path from 'path';
 import Set from 'lodash-es/set';
 
-import Constants from '../core/constants';
+import Constants from './constants';
 import Extension from './extension';
+import Git from './git';
 
 
 export class Registry {
@@ -29,20 +30,31 @@ export class Registry {
             return Promise.resolve();
         }
 
-        // Ensure extension manifest has been fetched
-        return Extension.fetch().then(() => {
+        // Ensure extension metadata has been fetched
+        return Extension.fetch()
             // Discover modules
-            if(environment === 'development') {
-                return this._discoverDevelopment();
-            }
+            .then(() => this._discover(environment).then(() => {
+                this._discovered = true;
+            }))
+            // Update extension version
+            .then(() => {
+                // Mark extension as dirty (uncommitted changes)
+                if(this.dirty) {
+                    Extension.setDirty(environment);
+                }
 
-            if(environment === 'production') {
-                return this._discoverProduction();
-            }
+                // Display extension version
+                let color = GulpUtil.colors.green;
 
-            // Unknown environment
-            return Promise.reject(new Error('Invalid environment: ' + environment));
-        });
+                if(Extension.isDirty(environment)) {
+                    color = GulpUtil.colors.red;
+                }
+
+                GulpUtil.log(
+                    color('Extension Version: %s'),
+                    Extension.getVersion(environment)
+                );
+            });
     }
 
     register(path, options) {
@@ -55,42 +67,43 @@ export class Registry {
         let type = options.type || this._getModuleType(name);
 
         // Retrieve module details
-        return this._getModuleDetails(path)
-            .then((module) => {
-                if(!module.name || module.name !== name) {
-                    return Promise.reject(new Error('Invalid name, found: "' + module.name + '"'));
-                }
+        return this._getMetadata(path).then((module) => {
+            if(!module.name || module.name !== name) {
+                return Promise.reject(new Error('Invalid name, found: "' + module.name + '"'));
+            }
 
-                // Set module attributes
-                module = {
-                    ...module,
+            // Set module attributes
+            module = {
+                ...module,
 
-                    environment: options.environment,
-                    path: path,
-                    type: type
-                };
+                environment: options.environment,
+                path: path,
+                type: type
+            };
 
-                // Register module
-                Set(this._modules,       [options.environment, name],        module);
-                Set(this._modulesByPath, [options.environment, module.path], module);
-                Set(this._modulesByType, [options.environment, type, name],  module);
+            // Register module
+            Set(this._modules,       [options.environment, name],        module);
+            Set(this._modulesByPath, [options.environment, module.path], module);
+            Set(this._modulesByType, [options.environment, type, name],  module);
 
-                GulpUtil.log(
-                    GulpUtil.colors.green('[%s] Registered: %s'),
-                    PadEnd(name, 35), path
-                );
-            })
-            .catch((err) => {
-                GulpUtil.log(
-                    GulpUtil.colors.red('[%s] %s'),
-                    PadEnd(name, 35), err.message
-                );
-                return Promise.reject(err);
-            });
+            // Resolve promise with module
+            return module;
+        }, (err) => {
+            GulpUtil.log(
+                GulpUtil.colors.red('[%s] %s'),
+                PadEnd(name, 35), err.message
+            );
+
+            return Promise.reject(err);
+        });
     }
 
     get(environment, name) {
         return this._modules[environment][name];
+    }
+
+    getIndex(environment) {
+        return this._modules[environment];
     }
 
     list(environment, selector) {
@@ -102,6 +115,19 @@ export class Registry {
     }
 
     // region Private Methods
+
+    _discover(environment) {
+        if(environment === 'development') {
+            return this._discoverDevelopment();
+        }
+
+        if(environment === 'production') {
+            return this._discoverProduction();
+        }
+
+        // Unknown environment
+        return Promise.reject(new Error('Invalid environment: ' + environment));
+    }
 
     _discoverDevelopment() {
         let promises = [];
@@ -135,20 +161,18 @@ export class Registry {
                 promises.push(this.register(modulePath, {
                     environment: 'development',
                     type: collectionType
+                }).then((module) => {
+                    // Display module version
+                    this._logModuleRegistration(module, Path.relative(
+                        Constants.ProjectPath,
+                        modulePath
+                    ));
                 }));
             }
         }
 
         // Wait for modules to be registered
-        return Promise.all(promises).then(() => {
-            GulpUtil.log(
-                GulpUtil.colors.green('Registered %d module(s)'),
-                Object.keys(this._modules['development']).length
-            );
-
-            // Update state
-            this._discovered = true;
-        });
+        return Promise.all(promises);
     }
 
     _discoverProduction() {
@@ -173,20 +197,32 @@ export class Registry {
                 }
 
                 // Load module
-                promises.push(this.register(modulePath));
+                promises.push(this.register(modulePath).then((module) => {
+                    // Display module version
+                    this._logModuleRegistration(module, Path.relative(
+                        Path.resolve(Constants.PackagePath, 'node_modules'),
+                        modulePath
+                    ));
+                }));
             }
         }
 
         // Wait for modules to be registered
-        return Promise.all(promises).then(() => {
-            GulpUtil.log(
-                GulpUtil.colors.green('Registered %d module(s)'),
-                Object.keys(this._modules['production']).length
-            );
+        return Promise.all(promises);
+    }
 
-            // Update state
-            this._discovered = true;
-        });
+    _logModuleRegistration(module, relativePath) {
+        let color = GulpUtil.colors.green;
+
+        if(module.dirty) {
+            color = GulpUtil.colors.red;
+        }
+
+        // Display module version
+        GulpUtil.log(
+            color('[%s] Registered: %s (%s)'),
+            PadEnd(module.name, 35), relativePath, module.version
+        );
     }
 
     _getCollectionType(type) {
@@ -233,22 +269,42 @@ export class Registry {
         throw new Error('Unknown collection type: ' + type);
     }
 
-    _getModuleDetails(path) {
-        return Promise.resolve()
-            // Retrieve module manifest
-            .then(() => this._getModuleManifest(path, { required: false }))
-            // Retrieve module package details, and merge with manifest
-            .then((manifest) => this._getModulePackageDetails(path).then((data) => ({
+    _getMetadata(path) {
+        return this._getManifest(path, { required: false })
+            // Retrieve package details
+            .then((manifest) => this._getPackageDetails(path).then((data) => ({
                 name: data.name,
                 version: data.version,
                 ...manifest,
 
                 manifest: manifest,
                 package: data
-            })));
+            })))
+            // Try retrieve extension version from git (or fallback to manifest version)
+            .then((metadata) => this._getRepositoryDetails(path, metadata.version).then((repository) => {
+                let dirty = repository.version && repository.version.endsWith('-dirty');
+
+                // Mark registry as dirty (uncommitted module changes)
+                if(dirty) {
+                    this.dirty = true;
+                }
+
+                // Build module metadata
+                let result = {
+                    ...metadata,
+
+                    version: repository.version || metadata.version
+                };
+
+                if(dirty) {
+                    result.dirty = dirty;
+                }
+
+                return result;
+            }));
     }
 
-    _getModuleManifest(path, options) {
+    _getManifest(path, options) {
         options = Merge({
             required: true
         }, options || {});
@@ -285,7 +341,7 @@ export class Registry {
         });
     }
 
-    _getModulePackageDetails(path, options) {
+    _getPackageDetails(path, options) {
         options = Merge({
             required: true
         }, options || {});
@@ -344,6 +400,14 @@ export class Registry {
 
         // Unknown module name
         throw new Error('Unknown module name: ' + name);
+    }
+
+    _getRepositoryDetails(path, packageVersion) {
+        return Git.version(path, packageVersion).then((version) => ({
+            version
+        }), () => ({
+            version: null
+        }));
     }
 
     _parseModuleManifest(contents) {

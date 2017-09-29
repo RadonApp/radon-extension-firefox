@@ -52,7 +52,7 @@ Gulp.task('webextension:production', [
 ], () => {
     // Create archive of build
     return Gulp.src(Path.join(Constants.BuildDirectory.Production.Unpacked, '**/*'))
-        .pipe(GZip(buildDistributionName(Extension.version)))
+        .pipe(GZip(buildDistributionName(Extension.getVersion('production'))))
         .pipe(Gulp.dest(Constants.BuildDirectory.Production.Root));
 });
 
@@ -102,8 +102,8 @@ Gulp.task('hybrid:production:package', [
 ], () => {
     // Create archive of build
     return Gulp.src(Path.join(Constants.BuildDirectory.Production.Hybrid, '**/*'))
-        .pipe(GZip(buildDistributionName(Extension.version, {
-            type: 'hybrid'
+        .pipe(GZip(buildDistributionName(Extension.getVersion('production'), {
+            type: 'Hybrid'
         })))
         .pipe(Gulp.dest(Constants.BuildDirectory.Production.Root));
 });
@@ -115,7 +115,7 @@ Gulp.task('hybrid:production:manifest', [
     let manifest = JSON.parse(Filesystem.readFileSync('src/hybrid/package.json'));
 
     // Set manifest version
-    manifest.version = Extension.version;
+    manifest.version = Extension.getVersion('production');
 
     // Ensure destination directory exists
     Mkdirp(Constants.BuildDirectory.Production.Hybrid);
@@ -161,9 +161,9 @@ Gulp.task('hybrid:production:xpi:build', ['hybrid:production:package'], (done) =
 Gulp.task('hybrid:production:xpi', ['hybrid:production:xpi:build'], () => {
     // Copy xpi to build directory
     return Gulp.src(Path.join(Constants.BuildDirectory.Production.Hybrid, '*.xpi'))
-        .pipe(Rename(buildDistributionName(Extension.version, {
-            extension: 'xpi',
-            type: 'hybrid'
+        .pipe(Rename(buildDistributionName(Extension.getVersion('production'), {
+            type: 'Hybrid',
+            extension: 'xpi'
         })))
         .pipe(Gulp.dest(Constants.BuildDirectory.Production.Root));
 });
@@ -203,9 +203,7 @@ Gulp.task('webextension:development', [
 ], () => {
     // Create archive of build
     return Gulp.src(Path.join(Constants.BuildDirectory.Development.Unpacked, '**/*'))
-        .pipe(GZip(buildDistributionName(Extension.version, {
-            environment: 'dev'
-        })))
+        .pipe(GZip(buildDistributionName(Extension.getVersion('development'))))
         .pipe(Gulp.dest(Constants.BuildDirectory.Development.Root));
 });
 
@@ -255,9 +253,8 @@ Gulp.task('hybrid:development:package', [
 ], () => {
     // Create archive of build
     return Gulp.src(Path.join(Constants.BuildDirectory.Development.Hybrid, '**/*'))
-        .pipe(GZip(buildDistributionName(Extension.version, {
-            environment: 'dev',
-            type: 'hybrid'
+        .pipe(GZip(buildDistributionName(Extension.getVersion('development'), {
+            type: 'Hybrid'
         })))
         .pipe(Gulp.dest(Constants.BuildDirectory.Development.Root));
 });
@@ -269,7 +266,7 @@ Gulp.task('hybrid:development:manifest', [
     let manifest = JSON.parse(Filesystem.readFileSync('src/hybrid/package.json'));
 
     // Set manifest version
-    manifest.version = Extension.version;
+    manifest.version = Extension.getVersion('development');
 
     // Ensure destination directory exists
     Mkdirp(Constants.BuildDirectory.Development.Hybrid);
@@ -315,10 +312,9 @@ Gulp.task('hybrid:development:xpi:build', ['hybrid:development:package'], (done)
 Gulp.task('hybrid:development:xpi', ['hybrid:development:xpi:build'], () => {
     // Copy xpi to build directory
     return Gulp.src(Path.join(Constants.BuildDirectory.Development.Hybrid, '*.xpi'))
-        .pipe(Rename(buildDistributionName(Extension.version, {
-            environment: 'dev',
-            extension: 'xpi',
-            type: 'hybrid'
+        .pipe(Rename(buildDistributionName(Extension.getVersion('development'), {
+            type: 'Hybrid',
+            extension: 'xpi'
         })))
         .pipe(Gulp.dest(Constants.BuildDirectory.Development.Root));
 });

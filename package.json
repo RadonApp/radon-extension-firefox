@@ -50,6 +50,7 @@
     "mkdirp": "^0.5.1",
     "node-sass": "^4.5.2",
     "sass-loader": "^6.0.0",
+    "simple-git": "^1.77.0",
     "style-loader": "^0.13.1",
     "webpack": "^2.6.0",
     "whatwg-fetch": "^1.0.0"

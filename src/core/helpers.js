@@ -19,10 +19,6 @@ export function buildDistributionName(version, options) {
 
     tags.push(version);
 
-    if(isDefined(options.environment)) {
-        tags.push(options.environment);
-    }
-
     return tags.join('-') + '.' + (options.extension || 'zip');
 }
 
