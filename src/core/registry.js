@@ -289,9 +289,11 @@ export class Registry {
         return this._getManifest(path, { required: false })
             // Retrieve package details
             .then((manifest) => this._getPackageDetails(path).then((data) => ({
-                name: data.name,
-                version: data.version,
                 ...manifest,
+
+                name: data.name,
+                title: manifest.title,
+                version: data.version,
 
                 manifest: manifest,
                 package: data
@@ -436,7 +438,7 @@ export class Registry {
 
         // Set manifest defaults
         return {
-            title: null,
+            title: data.name || null,
             icons: {},
 
             content_scripts: [],

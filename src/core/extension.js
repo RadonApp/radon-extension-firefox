@@ -115,9 +115,11 @@ export class Extension {
         return this._getManifest({ required: false })
             // Retrieve package details
             .then((manifest) => this._getPackageDetails().then((details) => ({
-                name: details.name,
-                version: details.version,
                 ...manifest,
+
+                name: details.name,
+                title: manifest.title,
+                version: details.version,
 
                 manifest: manifest,
                 package: details
@@ -220,6 +222,8 @@ export class Extension {
         let modules = data.modules || {};
 
         return {
+            title: data.name || null,
+
             origins: [],
             permissions: [],
 
