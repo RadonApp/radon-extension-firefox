@@ -38,6 +38,10 @@ export function getOutputDirectory(environment, ...args) {
     return Path.join.apply(null, [basePath].concat(args));
 }
 
+export function getTaskName(environment, ...args) {
+    return args.join(':') + ':' + environment;
+}
+
 export function isDefined(value) {
     return typeof value !== 'undefined' && value !== null;
 }

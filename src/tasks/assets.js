@@ -1,12 +1,13 @@
 import Filesystem from 'fs';
 import Glob from 'glob';
+import Gulp from 'gulp';
 import GulpUtil from 'gulp-util';
 import Mkdirp from 'mkdirp';
 import PadEnd from 'lodash-es/padEnd';
 import Path from 'path';
 
-import Registry from './core/registry';
-import {getOutputDirectory} from './core/helpers';
+import Registry from '../core/registry';
+import {getOutputDirectory, getTaskName} from '../core/helpers';
 
 
 const Pattern = '**/*.{html,png,svg}';
@@ -24,6 +25,24 @@ export function build(environment) {
     return Promise.all(Registry.list(environment).map((module) => {
         return copyModuleAssets(module, outputPath);
     }));
+}
+
+export function createTask(environment) {
+    Gulp.task(getTaskName(environment, 'assets'), [
+        getTaskName(environment, 'clean'),
+        getTaskName(environment, 'discover')
+    ], (done) => {
+        build(environment).then(
+            () => done(),
+            done
+        );
+    });
+}
+
+export function createTasks(environments) {
+    environments.forEach((environment) =>
+        createTask(environment)
+    );
 }
 
 function copyModuleAssets(module, outputPath) {
@@ -86,5 +105,8 @@ function copyFile(sourcePath, outputPath) {
 }
 
 export default {
-    build: build
+    build,
+
+    createTask,
+    createTasks
 };

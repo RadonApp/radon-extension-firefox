@@ -1,4 +1,5 @@
 import Filesystem from 'fs';
+import Gulp from 'gulp';
 import GulpUtil from 'gulp-util';
 import Merge from 'lodash-es/merge';
 import Mkdirp from 'mkdirp';
@@ -7,11 +8,13 @@ import Util from 'util';
 import Webpack from 'webpack';
 
 import Base from './webpack.config';
-import Constants from './core/constants';
-import Extension from './core/extension';
-import Registry from './core/registry';
-import {getOutputDirectory} from './core/helpers';
+import Constants from '../core/constants';
+import Extension from '../core/extension';
+import Registry from '../core/registry';
+import {getOutputDirectory, getTaskName, isDefined} from '../core/helpers';
 
+
+let loggedModules = {};
 
 export function build(environment) {
     environment = environment || 'production';
@@ -56,7 +59,28 @@ export function build(environment) {
     });
 }
 
-export function constructCompiler(environment) {
+export function createTask(environment) {
+    Gulp.task(getTaskName(environment, 'webpack'), [
+        getTaskName(environment, 'clean'),
+        getTaskName(environment, 'discover')
+    ], (done) => {
+        build(environment).then(
+            (stats) => {
+                GulpUtil.log(stats.toString('normal'));
+                done();
+            },
+            done
+        );
+    });
+}
+
+export function createTasks(environments) {
+    environments.forEach((environment) =>
+        createTask(environment)
+    );
+}
+
+function constructCompiler(environment) {
     let outputPath = getOutputDirectory(environment, 'unpacked');
 
     // Generation configuration
@@ -84,9 +108,85 @@ export function constructCompiler(environment) {
     return Webpack(configuration);
 }
 
+function getPackagePath(modulePath) {
+    let result = Path.relative(Constants.ProjectPath, modulePath);
+
+    // Replace "node_modules" with "~"
+    result = result.replace('node_modules', '~');
+
+    // Strip module path
+    let lastModulesStart = result.indexOf('~');
+
+    if(lastModulesStart < 0) {
+        return result;
+    }
+
+    let nameEnd = result.indexOf(Path.sep, lastModulesStart + 2);
+
+    if(nameEnd < 0) {
+        return result;
+    }
+
+    return result.substring(0, nameEnd);
+}
+
+function logModule(color, name, modulePath, count, suffix) {
+    if(!isDefined(modulePath)) {
+        return;
+    }
+
+    let packagePath = getPackagePath(modulePath);
+
+    if(typeof loggedModules[name] === 'undefined') {
+        loggedModules[name] = {};
+    }
+
+    // Log included module (if not already logged)
+    if(typeof loggedModules[name][packagePath] === 'undefined') {
+        loggedModules[name][packagePath] = true;
+
+        // Log module details
+        GulpUtil.log(
+            color('[%s] %s (chunks: %s)%s'),
+            name, packagePath, count,
+            suffix ? (' ' + suffix) : ''
+        );
+    }
+}
+
+function getModuleType(path) {
+    if(!isDefined(path)) {
+        return null;
+    }
+
+    // Find matching module type
+    if(path.indexOf(Path.join(Constants.ProjectPath, 'Browsers')) === 0) {
+        return 'browser';
+    }
+
+    if(path.indexOf(Path.join(Constants.ProjectPath, 'Destinations')) === 0) {
+        return 'destination';
+    }
+
+    if(path.indexOf(Path.join(Constants.ProjectPath, 'Sources')) === 0) {
+        return 'source';
+    }
+
+    if(path.indexOf(Path.join(Constants.ProjectPath, 'neon-extension-core')) === 0) {
+        return 'core';
+    }
+
+    if(path.indexOf(Path.join(Constants.ProjectPath, 'neon-extension-framework')) === 0) {
+        return 'framework';
+    }
+
+    // Unknown module type
+    return null;
+}
+
 // region Configuration
 
-export function buildConfiguration(environment, outputPath) {
+function buildConfiguration(environment, outputPath) {
     let babelIncludePaths = getBabelIncludePaths(environment);
 
     return {
@@ -167,6 +267,105 @@ export function buildConfiguration(environment, outputPath) {
 
         plugins: [
             ...Base.plugins,
+
+            new Webpack.optimize.CommonsChunkPlugin({
+                name: 'background/common',
+
+                chunks: [
+                    'background/callback/callback',
+                    'background/main/main',
+                    'background/migrate/migrate',
+
+                    'background/messaging/messaging',
+                    'background/messaging/services/scrobble',
+                    'background/messaging/services/storage'
+                ],
+
+                minChunks: (module, count) => {
+                    let type = getModuleType(module.userRequest);
+
+                    if(count < 2 && ['browser', 'framework'].indexOf(type) < 0) {
+                        logModule(GulpUtil.colors.cyan, 'background/common', module.userRequest, count, '[type: ' + type + ']');
+                        return false;
+                    }
+
+                    logModule(GulpUtil.colors.green, 'background/common', module.userRequest, count, '[type: ' + type + ']');
+                    return true;
+                }
+            }),
+
+            new Webpack.optimize.CommonsChunkPlugin({
+                name: 'destination/common',
+
+                chunks: [].concat(...Registry.list(environment, {
+                    type: 'destination'
+                }).map((module) =>
+                    (module.webpack.chunks || []).map((chunk) =>
+                        'destination/' + module.key + '/' + chunk + '/' + chunk
+                    )
+                )),
+
+                minChunks: (module, count) => {
+                    let type = getModuleType(module.userRequest);
+
+                    if(count < 2 && ['browser', 'core', 'framework'].indexOf(type) < 0) {
+                        logModule(GulpUtil.colors.cyan, 'destination/common', module.userRequest, count, '[type: ' + type + ']');
+                        return false;
+                    }
+
+                    logModule(GulpUtil.colors.green, 'destination/common', module.userRequest, count, '[type: ' + type + ']');
+                    return true;
+                }
+            }),
+
+            new Webpack.optimize.CommonsChunkPlugin({
+                name: 'source/common',
+
+                chunks: [].concat(...Registry.list(environment, {
+                    type: 'source'
+                }).map((module) => [
+                    'source/' + module.key + '/' + module.key,
+
+                    // Include additional chunks
+                    ...(module.webpack.chunks || []).map((chunk) =>
+                        'source/' + module.key + '/' + chunk + '/' + chunk
+                    )
+                ])),
+
+                minChunks: (module, count) => {
+                    let type = getModuleType(module.userRequest);
+
+                    if(count < 2 && ['browser', 'core', 'framework'].indexOf(type) < 0) {
+                        logModule(GulpUtil.colors.cyan, 'source/common', module.userRequest, count, '[type: ' + type + ']');
+                        return false;
+                    }
+
+                    logModule(GulpUtil.colors.green, 'source/common', module.userRequest, count, '[type: ' + type + ']');
+                    return true;
+                }
+            }),
+
+            new Webpack.optimize.CommonsChunkPlugin({
+                name: 'common',
+
+                chunks: [
+                    'background/common',
+                    'destination/common',
+                    'source/common',
+
+                    'configuration/configuration'
+                ],
+
+                minChunks: (module, count) => {
+                    if(count < 2) {
+                        logModule(GulpUtil.colors.cyan, 'common', module.userRequest, count);
+                        return false;
+                    }
+
+                    logModule(GulpUtil.colors.green, 'common', module.userRequest, count);
+                    return true;
+                }
+            }),
 
             new Webpack.DefinePlugin({
                 'neon.manifests': JSON.stringify({
@@ -272,7 +471,9 @@ function getBabelIncludePaths(environment) {
         include.push(Path.resolve(module.path, 'src'));
 
         // Include additional directories from manifest
-        include.push(...module.webpack.babel);
+        include.push(...module.webpack.babel.map((path) =>
+            Path.resolve(module.path, path)
+        ));
     }
 
     return include;
@@ -432,6 +633,13 @@ function createModuleChunks(module) {
         ];
     });
 
+    (module.webpack.modules || []).forEach((name) => {
+        result[type + '/' + plugin + '/' + name + '/' + name] = [
+            ...Constants.CommonRequirements,
+            module.name + '/' + name
+        ];
+    });
+
     return result;
 }
 
@@ -553,5 +761,8 @@ function getServices(modules, type, options) {
 // endregion
 
 export default {
-    build: build
+    build,
+
+    createTask,
+    createTasks
 };

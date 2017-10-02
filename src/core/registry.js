@@ -78,6 +78,8 @@ export class Registry {
 
                 environment: options.environment,
                 path: path,
+
+                key: this._getModuleKey(module.name),
                 type: type
             };
 
@@ -269,6 +271,20 @@ export class Registry {
         throw new Error('Unknown collection type: ' + type);
     }
 
+    _getModuleKey(name) {
+        name = name.replace('neon-extension-', '');
+
+        // Find key position
+        let splitAt = name.indexOf('-');
+
+        if(splitAt < 0) {
+            return null;
+        }
+
+        // Return module key
+        return name.substring(splitAt + 1);
+    }
+
     _getMetadata(path) {
         return this._getManifest(path, { required: false })
             // Retrieve package details
@@ -438,7 +454,9 @@ export class Registry {
             // Set Webpack defaults
             webpack: Merge({
                 alias: [],
-                babel: []
+                babel: [],
+                chunks: [],
+                modules: [],
             }, data.webpack || {})
         }
     }

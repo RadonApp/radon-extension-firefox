@@ -1,15 +1,16 @@
 import CloneDeep from 'lodash-es/cloneDeep';
 import Filesystem from 'fs';
+import Gulp from 'gulp';
 import Merge from 'lodash-es/merge';
 import Mkdirp from 'mkdirp';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
 import Uniq from 'lodash-es/uniq';
 
-import Extension from './core/extension';
-import Log from './core/log';
-import Registry from './core/registry';
-import {getOutputDirectory, isDefined} from './core/helpers';
+import Extension from '../core/extension';
+import Log from '../core/log';
+import Registry from '../core/registry';
+import {getOutputDirectory, getTaskName, isDefined} from '../core/helpers';
 
 
 export function build(environment) {
@@ -19,6 +20,24 @@ export function build(environment) {
     return buildModuleManifests(environment)
         .then((manifests) => buildManifest(environment, manifests))
         .then((manifest) => writeManifest(environment, manifest));
+}
+
+export function createTask(environment) {
+    Gulp.task(getTaskName(environment, 'manifest'), [
+        getTaskName(environment, 'clean'),
+        getTaskName(environment, 'discover')
+    ], (done) => {
+        build(environment).then(
+            () => done(),
+            done
+        );
+    });
+}
+
+export function createTasks(environments) {
+    environments.forEach((environment) =>
+        createTask(environment)
+    );
 }
 
 function buildModuleManifests(environment) {
@@ -235,5 +254,8 @@ export function createContentScript(contentScript) {
 }
 
 export default {
-    build: build
+    build,
+
+    createTask,
+    createTasks
 };
