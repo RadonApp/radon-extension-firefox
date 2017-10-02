@@ -2,6 +2,7 @@ import Filesystem from 'fs';
 import Gulp from 'gulp';
 import Mkdirp from 'mkdirp';
 import Path from 'path';
+import Pick from 'lodash-es/pick';
 
 import Constants from '../../core/constants';
 import Extension from '../../core/extension';
@@ -19,8 +20,19 @@ export function createTask(environment) {
             'src/hybrid/package.json'
         )));
 
-        // Update manifest version
-        manifest.version = Extension.getVersion(environment);
+        // Update manifest
+        manifest = {
+            ...manifest,
+
+            // Retrieve extension version (for current environment)
+            version: Extension.getVersion(environment),
+
+            // Retrieve extension properties
+            ...Pick(Extension.manifest, [
+                'title',
+                'description'
+            ])
+        };
 
         // Build destination path
         let destinationPath = Path.join(
