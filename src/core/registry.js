@@ -113,7 +113,19 @@ export class Registry {
     }
 
     match(environment, path) {
-        return this._modulesByPath[environment][path];
+        path = Path.normalize(path);
+
+        for(let p in this._modulesByPath[environment]) {
+            if(!this._modulesByPath[environment].hasOwnProperty(p)) {
+                continue;
+            }
+
+            if(path.startsWith(p)) {
+                return this._modulesByPath[environment][p];
+            }
+        }
+
+        return null;
     }
 
     // region Private Methods
