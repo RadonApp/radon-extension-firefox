@@ -488,6 +488,9 @@ export class Registry {
             name: null,
             version: null,
 
+            dependencies: {},
+            peerDependencies: {},
+
             ...data
         };
     }

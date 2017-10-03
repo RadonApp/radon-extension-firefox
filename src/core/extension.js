@@ -273,6 +273,9 @@ export class Extension {
             name: null,
             version: null,
 
+            dependencies: {},
+            peerDependencies: {},
+
             ...data
         };
     }
