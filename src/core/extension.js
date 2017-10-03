@@ -4,11 +4,14 @@ import Path from 'path';
 
 import Constants from './constants';
 import Git from './git';
+import {isDefined} from './helpers';
 
 
 export class Extension {
     constructor() {
+        this._ahead = {};
         this._dirty = {};
+
         this._fetched = false;
         this._metadata = {};
     }
@@ -60,20 +63,28 @@ export class Extension {
         return version;
     }
 
+    setAhead(environment, value = true) {
+        this._ahead[environment] = value;
+    }
+
+    setDirty(environment, value = true) {
+        this._dirty[environment] = value;
+    }
+
+    isAhead(environment) {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return this._ahead[environment] || this._metadata.repository.ahead || false;
+    }
+
     isDirty(environment) {
         if(!this._fetched) {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
-        if(this._metadata.version.endsWith('-dirty')) {
-            return true;
-        }
-
-        return this._dirty[environment] || false;
-    }
-
-    setDirty(environment, value = true) {
-        this._dirty[environment] = value;
+        return this._dirty[environment] || this._metadata.repository.dirty || false;
     }
 
     getVersion(environment) {
@@ -81,10 +92,26 @@ export class Extension {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
+        let dirty = this.isDirty(environment);
+
+        // Retrieve current version
         let version = this._metadata.version;
 
-        // Ensure "-dirty" suffix has been added
-        if(this.isDirty(environment) && !version.endsWith('-dirty')) {
+        if(!isDefined(version)) {
+            return null;
+        }
+
+        // Ahead / Behind
+        if(this.isAhead(environment)) {
+            if(isDefined(this._metadata.repository.commit)) {
+                version += '-' + this._metadata.repository.commit.substring(0, 7);
+            } else {
+                dirty = true;
+            }
+        }
+
+        // Dirty
+        if(dirty) {
             version += '-dirty';
         }
 
@@ -128,7 +155,8 @@ export class Extension {
             .then((metadata) => this._getRepositoryDetails(metadata.version).then((repository) => ({
                 ...metadata,
 
-                version: repository.version || metadata.version
+                // Include repository details
+                repository
             })));
     }
 
@@ -203,9 +231,12 @@ export class Extension {
     }
 
     _getRepositoryDetails(packageVersion) {
-        return Git.version(Constants.PackagePath, packageVersion).then((version) => ({
-            version
-        }), () => ({
+        return Git.version(Constants.PackagePath, packageVersion).catch(() => ({
+            ahead: 0,
+            dirty: false,
+
+            commit: null,
+            tag: null,
             version: null
         }));
     }

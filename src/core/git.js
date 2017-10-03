@@ -7,18 +7,12 @@ import {isDefined} from './helpers';
 
 export class Git {
     version(path, packageVersion) {
-        let repository = SimpleGit(path).silent(true);
-
         return this.status(path).then((status) => {
-            if(!isDefined(status.version) && !isDefined(packageVersion)) {
-                return Promise.reject(new Error('Unable to find version'));
-            }
-
             // Build version
             let version;
 
-            if(isDefined(status.version)) {
-                version = status.version;
+            if(isDefined(status.tag)) {
+                version = status.tag.substring(1);
 
                 if(status.ahead > 0) {
                     version += '-' + status.commit.substring(0, 7)
@@ -31,27 +25,11 @@ export class Git {
                 version += '-dirty';
             }
 
-            return version;
-        });
+            return {
+                ...status,
 
-        return this._getDescription(repository).then((version) => {
-            console.log('version:', version);
-
-            if(!isDefined(version)) {
-                return null;
-            }
-
-            // Build version
-            if(version.indexOf('v') === 0) {
-                version = version.substring(1);
-            } else if(version.length > 0) {
-                version = packageVersion + '-' + version;
-            } else {
-                version = packageVersion;
-            }
-
-            // Remove whitespace
-            return version.trim();
+                version
+            };
         });
     }
 
@@ -66,19 +44,32 @@ export class Git {
 
         // Retrieve repository status
         return Promise.resolve()
-            // Retrieve latest version tag
-            .then(() => this._getDescription(repository).then((version) => ({
-                version: version.substring(1)
+            // Retrieve latest version
+            .then(() => this._getLatestTag(repository).then((tag) => ({
+                tag: tag
             }), () => ({
-                version: null
+                tag: null
+            })))
+
+            // Retrieve commits since latest version
+            .then((result) => this._getCommits(repository, result.tag).then((commits) => ({
+                ...result,
+
+                ahead: commits.total
+            }), () => ({
+                ...result,
+
+                ahead: 0
             })))
 
             // Retrieve latest commit hash
-            .then((result) => this._getHash(repository, ['HEAD']).then((commit) => ({
+            .then((result) => this._resolveHash(repository).then((commit) => ({
                 ...result,
+
                 commit
             }), () => ({
                 ...result,
+
                 commit: null
             })))
 
@@ -86,19 +77,28 @@ export class Git {
             .then((result) => this._getStatus(repository).then((status) => ({
                 ...result,
 
-                ahead: status.ahead,
-                behind: status.behind,
                 dirty: status.files.length > 0
             }), () => ({
                 ...result,
 
-                ahead: 0,
-                behind: 0,
                 dirty: false
             })));
     }
 
-    _getDescription(repository) {
+    _getCommits(repository, from, to = 'HEAD') {
+        return new Promise((resolve, reject) => {
+            repository.log({ from, to }, (err, commits) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+
+                resolve(commits);
+            });
+        });
+    }
+
+    _getLatestTag(repository) {
         return new Promise((resolve, reject) => {
             repository.raw([
                 'describe',
@@ -116,19 +116,6 @@ export class Git {
         });
     }
 
-    _getHash(repository, name) {
-        return new Promise((resolve, reject) => {
-            repository.revparse(name, (err, hash) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-
-                resolve(hash.trim());
-            });
-        })
-    }
-
     _getStatus(repository) {
         return new Promise((resolve, reject) => {
             repository.status((err, status) => {
@@ -140,6 +127,19 @@ export class Git {
                 resolve(status);
             });
         });
+    }
+
+    _resolveHash(repository, name = 'HEAD') {
+        return new Promise((resolve, reject) => {
+            repository.revparse([name], (err, hash) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+
+                resolve(hash.trim());
+            });
+        })
     }
 }
 

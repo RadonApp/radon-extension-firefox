@@ -9,10 +9,14 @@ import Set from 'lodash-es/set';
 import Constants from './constants';
 import Extension from './extension';
 import Git from './git';
+import {isDefined} from '../core/helpers';
 
 
 export class Registry {
     constructor() {
+        this.ahead = false;
+        this.dirty = false;
+
         this._modules = {};
         this._modulesByPath = {};
         this._modulesByType = {};
@@ -38,13 +42,16 @@ export class Registry {
             }))
             // Update extension version
             .then(() => {
-                // Mark extension as dirty (uncommitted changes)
-                if(this.dirty) {
-                    Extension.setDirty(environment);
-                }
+                // Update extension state
+                if(this.ahead) Extension.setAhead(environment);
+                if(this.dirty) Extension.setDirty(environment);
 
                 // Display extension version
                 let color = GulpUtil.colors.green;
+
+                if(Extension.isAhead(environment)) {
+                    color = GulpUtil.colors.yellow;
+                }
 
                 if(Extension.isDirty(environment)) {
                     color = GulpUtil.colors.red;
@@ -71,6 +78,10 @@ export class Registry {
             if(!module.name || module.name !== name) {
                 return Promise.reject(new Error('Invalid name, found: "' + module.name + '"'));
             }
+
+            // Update state
+            this.ahead = this.ahead || module.repository.ahead;
+            this.dirty = this.dirty || module.repository.dirty;
 
             // Set module attributes
             module = {
@@ -228,8 +239,10 @@ export class Registry {
     _logModuleRegistration(module, relativePath) {
         let color = GulpUtil.colors.green;
 
-        if(module.dirty) {
+        if(isDefined(module.repository) && module.repository.dirty) {
             color = GulpUtil.colors.red;
+        } else if(isDefined(module.repository) && module.repository.ahead) {
+            color = GulpUtil.colors.yellow;
         }
 
         // Display module version
@@ -312,25 +325,15 @@ export class Registry {
             })))
             // Try retrieve extension version from git (or fallback to manifest version)
             .then((metadata) => this._getRepositoryDetails(path, metadata.version).then((repository) => {
-                let dirty = repository.version && repository.version.endsWith('-dirty');
-
-                // Mark registry as dirty (uncommitted module changes)
-                if(dirty) {
-                    this.dirty = true;
-                }
-
-                // Build module metadata
-                let result = {
+                return {
                     ...metadata,
 
+                    // Include repository details
+                    repository,
+
+                    // Pick repository version, or fallback to metadata version
                     version: repository.version || metadata.version
                 };
-
-                if(dirty) {
-                    result.dirty = dirty;
-                }
-
-                return result;
             }));
     }
 
@@ -433,9 +436,12 @@ export class Registry {
     }
 
     _getRepositoryDetails(path, packageVersion) {
-        return Git.version(path, packageVersion).then((version) => ({
-            version
-        }), () => ({
+        return Git.version(path, packageVersion).catch(() => ({
+            ahead: 0,
+            dirty: false,
+
+            commit: null,
+            tag: null,
             version: null
         }));
     }
