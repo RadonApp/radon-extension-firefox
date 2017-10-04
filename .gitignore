@@ -4,5 +4,6 @@
 /releases
 
 /gulpfile.tmp*
+/package-lock.json
 
 *.iml
