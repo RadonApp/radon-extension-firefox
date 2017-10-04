@@ -118,9 +118,6 @@ export function createConfiguration(environment, outputPath) {
         },
 
         plugins: [
-            // Create module validator plugin for environment
-            Validator.createPlugin(environment),
-
             //
             // Commons Chunks
             //
@@ -266,6 +263,14 @@ export function createConfiguration(environment, outputPath) {
                 debug: environment !== 'production',
                 minimize: environment === 'production'
             }),
+
+            //
+            // Dependency Validator
+            //
+
+            ...(environment === 'development' ? [
+                Validator.createPlugin(environment)
+            ] : []),
 
             //
             // Uglify
