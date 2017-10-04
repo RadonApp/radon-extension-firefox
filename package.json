@@ -35,7 +35,7 @@
     "neon-extension-browser-base": "1.3.0-beta",
     "neon-extension-browser-firefox": "1.3.0-beta",
     "neon-extension-browser-webextension": "1.3.0-beta",
-    "neon-extension-destination-lastfm": "1.3.1-beta",
+    "neon-extension-destination-lastfm": "1.3.2-beta",
     "neon-extension-source-googlemusic": "1.3.1-beta"
   },
   "devDependencies": {
