@@ -1,4 +1,5 @@
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import Filesystem from 'fs';
 import GulpUtil from 'gulp-util';
 import Path from 'path';
 import Webpack from 'webpack';
@@ -306,9 +307,17 @@ function getBabelPaths(environment) {
         include.push(Path.resolve(module.path, 'src'));
 
         // Include additional directories from manifest
-        include.push(...module.webpack.babel.map((path) =>
-            Path.resolve(module.path, path)
-        ));
+        include.push(...module.webpack.babel
+            .map((path) => getValidPath(
+                Path.resolve(module.path, path),
+
+                // Fallback to package modules
+                Path.resolve(Constants.PackagePath, path)
+            ))
+            .filter((value) =>
+                value !== null
+            )
+        );
     }
 
     return include;
@@ -411,4 +420,14 @@ function generateModuleIdentifier(module, fallback) {
 
 function cleanModuleIdentifier(value) {
     return value.replace(/\s/g, '/').replace(/\\/g, '/');
+}
+
+function getValidPath(...paths) {
+    for(let i = 0; i < paths.length; i++) {
+        if(Filesystem.existsSync(paths[i])) {
+            return paths[i];
+        }
+    }
+
+    return null;
 }
