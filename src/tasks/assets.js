@@ -6,6 +6,7 @@ import Mkdirp from 'mkdirp';
 import PadEnd from 'lodash-es/padEnd';
 import Path from 'path';
 
+import Constants from '../core/constants';
 import Registry from '../core/registry';
 import {getOutputDirectory, getTaskName} from '../core/helpers';
 
@@ -21,10 +22,10 @@ export function build(environment) {
     // Ensure output directory exists
     Mkdirp.sync(outputPath);
 
-    // Copy module assets to output directory
-    return Promise.all(Registry.list(environment).map((module) => {
-        return copyModuleAssets(module, outputPath);
-    }));
+    // Copy assets to output directory
+    return copyModules(environment, outputPath).then(() =>
+        copyPackageAssets(outputPath)
+    );
 }
 
 export function createTask(environment) {
@@ -43,6 +44,35 @@ export function createTasks(environments) {
     environments.forEach((environment) =>
         createTask(environment)
     );
+}
+
+function copyPackageAssets(outputPath) {
+    let sourcePath = Path.join(Constants.PackagePath, 'assets');
+
+    // Ensure source path exists
+    if(!Filesystem.existsSync(sourcePath)) {
+        return false;
+    }
+
+    // Copy assets to build directory
+    return copy(sourcePath, outputPath).then((files) => {
+        GulpUtil.log(
+            GulpUtil.colors.green('Copied %d asset(s)'),
+            files.length
+        );
+    }, (err) => {
+        GulpUtil.log(
+            GulpUtil.colors.red('Unable to copy assets: %s'),
+            err.message
+        );
+        return Promise.reject(err);
+    });
+}
+
+function copyModules(environment, outputPath) {
+    return Promise.all(Registry.list(environment).map((module) => {
+        return copyModuleAssets(module, outputPath);
+    }));
 }
 
 function copyModuleAssets(module, outputPath) {
