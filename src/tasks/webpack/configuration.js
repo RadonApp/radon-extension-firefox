@@ -230,8 +230,9 @@ export function createConfiguration(environment, outputPath) {
 
             new Webpack.DefinePlugin({
                 'neon.manifests': JSON.stringify({
-                    'neon-extension': Extension.metadata,
-                    ...Registry.getIndex(environment)
+                    'neon-extension': Extension.toPlainObject(environment),
+
+                    ...Registry.toPlainObject(environment)
                 }),
 
                 'process.env': {

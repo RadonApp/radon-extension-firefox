@@ -1,6 +1,7 @@
 import Filesystem from 'fs';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
+import Pick from 'lodash-es/pick';
 
 import Constants from './constants';
 import Git from './git';
@@ -135,6 +136,29 @@ export class Extension {
 
             return details;
         });
+    }
+
+    toPlainObject(environment) {
+        return {
+            ...Pick(this.metadata, [
+                'name',
+
+                'title',
+                'description',
+                'version',
+
+                // Required Permissions
+                'origins',
+                'permissions',
+
+                // Optional Permissions
+                'optional_origins',
+                'optional_permissions'
+            ]),
+
+            // Generate version for environment
+            version: this.getVersion(environment)
+        };
     }
 
     _getMetadata() {

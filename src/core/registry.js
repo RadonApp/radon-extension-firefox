@@ -1,9 +1,11 @@
 import Filesystem from 'fs';
 import Filter from 'lodash-es/filter';
 import GulpUtil from 'gulp-util';
+import MapValues from 'lodash-es/mapValues';
 import Merge from 'lodash-es/merge';
 import PadEnd from 'lodash-es/padEnd';
 import Path from 'path';
+import Pick from 'lodash-es/pick';
 import Set from 'lodash-es/set';
 
 import Constants from './constants';
@@ -115,10 +117,6 @@ export class Registry {
         return this._modules[environment][name];
     }
 
-    getIndex(environment) {
-        return this._modules[environment];
-    }
-
     list(environment, selector) {
         return Filter(this._modules[environment], selector);
     }
@@ -137,6 +135,28 @@ export class Registry {
         }
 
         return null;
+    }
+
+    toPlainObject(environment) {
+        return MapValues(this._modules[environment], (module) => Pick(module, [
+            'name',
+            'type',
+            'key',
+
+            'title',
+            'version',
+
+            'content_scripts',
+            'services',
+
+            // Required Permissions
+            'origins',
+            'permissions',
+
+            // Optional Permissions
+            'optional_origins',
+            'optional_permissions'
+        ]));
     }
 
     // region Private Methods
