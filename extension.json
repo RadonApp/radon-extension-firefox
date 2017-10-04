@@ -1,6 +1,6 @@
 {
-  "name": "Neon",
-  "description": "Neon",
+  "name": "Google Music Scrobbler",
+  "description": "Google Play Music last.fm scrobbler",
 
   "applications": {
     "gecko": {
