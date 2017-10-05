@@ -230,7 +230,7 @@ function getModuleServices(environment, module) {
         items.push(mainPath);
     }
 
-    return items.sort();
+    return items;
 }
 
 function getServices(modules, type, options) {
@@ -283,7 +283,7 @@ function getServices(modules, type, options) {
         }
     }
 
-    return items.sort();
+    return items;
 }
 
 export default {

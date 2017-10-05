@@ -135,7 +135,7 @@ export class Registry {
 
         // Sort modules (if enabled)
         if(isDefined(options.sort) && options.sort !== false) {
-            modules = SortBy(modules, options.sort || 'name');
+            modules = SortBy(modules, options.sort === true ? 'name' : options.sort);
         }
 
         return modules;

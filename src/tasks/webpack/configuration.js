@@ -305,7 +305,7 @@ function getBabelPaths(environment) {
         );
     }
 
-    return items.sort();
+    return items;
 }
 
 function getModuleAliases(environment) {
