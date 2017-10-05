@@ -267,10 +267,7 @@ export class Registry {
                 // Load module
                 promises.push(this.register(modulePath).then((module) => {
                     // Display module version
-                    this._logModuleRegistration(module, Path.relative(
-                        Path.resolve(Constants.PackagePath, 'node_modules'),
-                        modulePath
-                    ));
+                    this._logModuleRegistration(module, Extension.modules[type][i]);
                 }));
             }
         }
@@ -279,7 +276,7 @@ export class Registry {
         return Promise.all(promises);
     }
 
-    _logModuleRegistration(module, relativePath) {
+    _logModuleRegistration(module, path) {
         let color = GulpUtil.colors.green;
 
         if(isDefined(module.repository) && module.repository.dirty) {
@@ -291,7 +288,7 @@ export class Registry {
         // Display module version
         GulpUtil.log(
             color('[%s] Registered: %s (%s)'),
-            PadEnd(module.name, 35), relativePath, module.version
+            PadEnd(module.name, 35), path, module.version
         );
     }
 
