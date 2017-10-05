@@ -184,7 +184,7 @@ function getModuleServices(environment, module) {
     let coreModule = Registry.get(environment, 'neon-extension-core');
 
     // Find module services
-    let result = [];
+    let items = [];
 
     for(let i = 0; i < module.services.length; i++) {
         let type = module.services[i];
@@ -210,7 +210,7 @@ function getModuleServices(environment, module) {
 
         // Only include the plugin configuration service
         if(type === 'configuration') {
-            result.push(servicePath);
+            items.push(servicePath);
             continue;
         }
 
@@ -226,11 +226,11 @@ function getModuleServices(environment, module) {
         }
 
         // Found service
-        result.push(servicePath);
-        result.push(mainPath);
+        items.push(servicePath);
+        items.push(mainPath);
     }
 
-    return result;
+    return items.sort();
 }
 
 function getServices(modules, type, options) {
@@ -283,7 +283,7 @@ function getServices(modules, type, options) {
         }
     }
 
-    return items;
+    return items.sort();
 }
 
 export default {

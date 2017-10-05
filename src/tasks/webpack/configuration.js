@@ -298,16 +298,16 @@ function getBabelPaths(environment) {
     let modules = Registry.list(environment);
 
     // Build list of babel includes
-    let include = [];
+    let items = [];
 
     for(let i = 0; i < modules.length; i++) {
         let module = modules[i];
 
         // Include source directory
-        include.push(Path.resolve(module.path, 'src'));
+        items.push(Path.resolve(module.path, 'src'));
 
         // Include additional directories from manifest
-        include.push(...module.webpack.babel
+        items.push(...module.webpack.babel
             .map((path) => getValidPath(
                 Path.resolve(module.path, path),
 
@@ -320,7 +320,7 @@ function getBabelPaths(environment) {
         );
     }
 
-    return include;
+    return items.sort();
 }
 
 function getModuleAliases(environment) {

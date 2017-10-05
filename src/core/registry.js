@@ -7,6 +7,7 @@ import PadEnd from 'lodash-es/padEnd';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
 import Set from 'lodash-es/set';
+import SortBy from 'lodash-es/sortBy';
 
 import Constants from './constants';
 import Extension from './extension';
@@ -117,8 +118,27 @@ export class Registry {
         return this._modules[environment][name];
     }
 
-    list(environment, selector) {
-        return Filter(this._modules[environment], selector);
+    list(environment, options) {
+        options = Merge({
+            filter: {},
+            sort: true,
+            type: null
+        }, options || {});
+
+        // Enable "type" filter
+        if(isDefined(options.type)) {
+            options.filter.type = options.type;
+        }
+
+        // Filter modules
+        let modules = Filter(this._modules[environment], options.filter);
+
+        // Sort modules (if enabled)
+        if(isDefined(options.sort) && options.sort !== false) {
+            modules = SortBy(modules, options.sort || 'name');
+        }
+
+        return modules;
     }
 
     match(environment, path) {
@@ -138,7 +158,7 @@ export class Registry {
     }
 
     toPlainObject(environment) {
-        return MapValues(this._modules[environment], (module) => Pick(module, [
+        let modules = MapValues(this._modules[environment], (module) => Pick(module, [
             'name',
             'type',
             'key',
@@ -157,6 +177,9 @@ export class Registry {
             'optional_origins',
             'optional_permissions'
         ]));
+
+        // Sort modules by key
+        return Pick(modules, Object.keys(modules).sort());
     }
 
     // region Private Methods
