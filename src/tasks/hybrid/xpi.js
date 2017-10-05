@@ -1,7 +1,6 @@
 import Gulp from 'gulp';
 import Path from 'path';
 import Rename from 'gulp-rename';
-import {exec} from 'child_process';
 
 import Constants from '../../core/constants';
 import Extension from '../../core/extension';
@@ -9,29 +8,19 @@ import {buildDistributionName, getTaskName} from '../../core/helpers';
 
 
 export function createTask(environment) {
-    Gulp.task(getTaskName(environment, 'hybrid:xpi:build'), [
-        getTaskName(environment, 'hybrid:package')
-    ], (done) => {
-        // Create xpi of build
-        exec('jpm xpi', {
-            cwd: Path.join(Constants.BuildDirectory.Root, environment, 'hybrid')
-        }, function (err, stdout, stderr) {
-            console.log(stdout);
-            console.log(stderr);
-            done(err);
-        });
-    });
-
     Gulp.task(getTaskName(environment, 'hybrid:xpi'), [
-        getTaskName(environment, 'hybrid:xpi:build')
+        getTaskName(environment, 'hybrid:package')
     ], () => {
-        // Copy xpi to build directory
-        return Gulp.src(Path.join(Constants.BuildDirectory.Root, environment, 'hybrid/*.xpi'))
-            .pipe(Rename(buildDistributionName(Extension.getVersion(environment), {
+        let basePath = Path.join(Constants.BuildDirectory.Root, environment);
+        let version = Extension.getVersion(environment);
+
+        // Rename archive to xpi
+        return Gulp.src(Path.join(basePath, buildDistributionName(version, { type: 'Hybrid' })))
+            .pipe(Rename(buildDistributionName(version, {
                 type: 'Hybrid',
                 extension: 'xpi'
             })))
-            .pipe(Gulp.dest(Path.join(Constants.BuildDirectory.Root, environment)));
+            .pipe(Gulp.dest(basePath));
     });
 }
 
