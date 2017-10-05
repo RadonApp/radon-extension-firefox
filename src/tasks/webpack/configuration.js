@@ -1,7 +1,8 @@
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import Filesystem from 'fs';
-import GulpUtil from 'gulp-util';
+import Merge from 'lodash-es/merge';
 import Path from 'path';
+import Set from 'lodash-es/set';
 import Webpack from 'webpack';
 
 import Constants from '../../core/constants';
@@ -10,8 +11,9 @@ import Registry from '../../core/registry';
 import Validator from './validator';
 import {isDefined} from '../../core/helpers';
 import {createChunks} from './chunks';
-import {logModule} from './helpers';
 
+
+export let ExtractedModules = {};
 
 export function createConfiguration(environment, outputPath) {
     return {
@@ -136,17 +138,13 @@ export function createConfiguration(environment, outputPath) {
                     'background/messaging/services/storage'
                 ],
 
-                minChunks: (module, count) => {
-                    let type = getModuleType(module.userRequest);
+                minChunks: (module, count) => shouldExtractModule(module, count, {
+                    chunk: 'background/common',
+                    environment,
 
-                    if(count < 2 && ['browser', 'framework'].indexOf(type) < 0) {
-                        logModule(GulpUtil.colors.cyan, 'background/common', module.userRequest, count, '[type: ' + type + ']');
-                        return false;
-                    }
-
-                    logModule(GulpUtil.colors.green, 'background/common', module.userRequest, count, '[type: ' + type + ']');
-                    return true;
-                }
+                    shared: true,
+                    types: ['browser', 'framework']
+                })
             }),
 
             new Webpack.optimize.CommonsChunkPlugin({
@@ -160,17 +158,13 @@ export function createConfiguration(environment, outputPath) {
                     )
                 )),
 
-                minChunks: (module, count) => {
-                    let type = getModuleType(module.userRequest);
+                minChunks: (module, count) => shouldExtractModule(module, count, {
+                    chunk: 'destination/common',
+                    environment,
 
-                    if(count < 2 && ['browser', 'core', 'framework'].indexOf(type) < 0) {
-                        logModule(GulpUtil.colors.cyan, 'destination/common', module.userRequest, count, '[type: ' + type + ']');
-                        return false;
-                    }
-
-                    logModule(GulpUtil.colors.green, 'destination/common', module.userRequest, count, '[type: ' + type + ']');
-                    return true;
-                }
+                    shared: true,
+                    types: ['browser', 'core', 'framework']
+                })
             }),
 
             new Webpack.optimize.CommonsChunkPlugin({
@@ -187,17 +181,13 @@ export function createConfiguration(environment, outputPath) {
                     )
                 ])),
 
-                minChunks: (module, count) => {
-                    let type = getModuleType(module.userRequest);
+                minChunks: (module, count) => shouldExtractModule(module, count, {
+                    chunk: 'source/common',
+                    environment,
 
-                    if(count < 2 && ['browser', 'core', 'framework'].indexOf(type) < 0) {
-                        logModule(GulpUtil.colors.cyan, 'source/common', module.userRequest, count, '[type: ' + type + ']');
-                        return false;
-                    }
-
-                    logModule(GulpUtil.colors.green, 'source/common', module.userRequest, count, '[type: ' + type + ']');
-                    return true;
-                }
+                    shared: true,
+                    types: ['browser', 'core', 'framework']
+                })
             }),
 
             new Webpack.optimize.CommonsChunkPlugin({
@@ -211,15 +201,10 @@ export function createConfiguration(environment, outputPath) {
                     'configuration/configuration'
                 ],
 
-                minChunks: (module, count) => {
-                    if(count < 2) {
-                        logModule(GulpUtil.colors.cyan, 'common', module.userRequest, count);
-                        return false;
-                    }
-
-                    logModule(GulpUtil.colors.green, 'common', module.userRequest, count);
-                    return true;
-                }
+                minChunks: (module, count) => shouldExtractModule(module, count, {
+                    chunk: 'common',
+                    environment
+                })
             }),
 
             //
@@ -363,34 +348,148 @@ function getModulePaths(environment) {
     ];
 }
 
-function getModuleType(path) {
+function shouldExtractModule(module, count, options) {
+    options = Merge({
+        chunk: null,
+        environment: null,
+
+        count: 2,
+        shared: false,
+        types: [],
+    }, options || {});
+
+    // Validate options
+    if(!isDefined(options.chunk)) {
+        throw new Error('Missing required option: chunk');
+    }
+
+    if(!isDefined(options.environment)) {
+        throw new Error('Missing required option: environment');
+    }
+
+    // Retrieve module details
+    let details = {
+        name: null,
+        type: null,
+
+        ...(getModuleDetails(options.environment, module.userRequest) || {})
+    };
+
+    // Determine if module should be included
+    let include = false;
+
+    if(count >= options.count) {
+        include = true;
+    } else if(options.types.indexOf(details.type) >= 0) {
+        include = true;
+    } else if(options.shared && details.type === 'dependency' && isSharedDependency(details.name)) {
+        include = true;
+    }
+
+    // Ignore excluded/invalid modules
+    if(!isDefined(module.userRequest) || !include) {
+        return include;
+    }
+
+    // Shorten request
+    let request = module.userRequest;
+
+    if(isDefined(details.name)) {
+        let start = request.indexOf(details.name);
+
+        if(start >= 0) {
+            request = request.substring(start);
+        }
+    }
+
+    // Store extracted module location
+    Set(ExtractedModules, [options.environment, request], options.chunk);
+
+    return include;
+}
+
+function getModuleDetails(environment, path) {
     if(!isDefined(path)) {
         return null;
     }
 
-    // Find matching module type
-    if(path.indexOf(Path.join(Constants.ProjectPath, 'Browsers')) === 0) {
-        return 'browser';
+    // Find matching module
+    let module = Registry.match(environment, path);
+
+    // Module
+    if(isDefined(module)) {
+        if(path.startsWith(Path.resolve(module.path, 'node_modules'))) {
+            return {
+                type: 'dependency',
+                name: getModuleName(Path.resolve(module.path, 'node_modules'), path)
+            };
+        }
+
+        if(module.name === 'neon-extension-core') {
+            return {
+                type: 'core',
+                name: module.name
+            };
+        }
+
+        if(module.name === 'neon-extension-framework') {
+            return {
+                type: 'framework',
+                name: module.name
+            };
+        }
+
+        if(module.name.startsWith('neon-extension-browser-')) {
+            return {
+                type: 'browser',
+                name: module.name
+            };
+        }
+
+        if(module.name.startsWith('neon-extension-destination-')) {
+            return {
+                type: 'destination',
+                name: module.name
+            };
+        }
+
+        if(module.name.startsWith('neon-extension-source-')) {
+            return {
+                type: 'source',
+                name: module.name
+            };
+        }
     }
 
-    if(path.indexOf(Path.join(Constants.ProjectPath, 'Destinations')) === 0) {
-        return 'destination';
+    // Package
+    if(path.startsWith(Path.resolve(Constants.PackagePath, 'node_modules'))) {
+        return {
+            type: 'dependency',
+            name: getModuleName(Path.resolve(Constants.PackagePath, 'node_modules'), path)
+        };
     }
 
-    if(path.indexOf(Path.join(Constants.ProjectPath, 'Sources')) === 0) {
-        return 'source';
-    }
-
-    if(path.indexOf(Path.join(Constants.ProjectPath, 'neon-extension-core')) === 0) {
-        return 'core';
-    }
-
-    if(path.indexOf(Path.join(Constants.ProjectPath, 'neon-extension-framework')) === 0) {
-        return 'framework';
-    }
-
-    // Unknown module type
     return null;
+}
+
+function getModuleName(basePath, path) {
+    path = Path.relative(basePath, path);
+
+    let end = path.indexOf('\\');
+
+    if(path[0] === '@') {
+        end = path.indexOf('\\', end + 1);
+    }
+
+    return path.substring(0, end);
+}
+
+function isSharedDependency(name) {
+    if(name.startsWith('neon-extension-')) {
+        return false;
+    }
+
+    return isDefined(Extension.package.dependencies[name]);
 }
 
 function generateModuleIdentifier(module, fallback) {

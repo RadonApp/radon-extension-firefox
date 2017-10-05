@@ -1,12 +1,15 @@
 import Filesystem from 'fs';
+import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
 import GulpUtil from 'gulp-util';
 import Mkdirp from 'mkdirp';
+import PadEnd from 'lodash-es/padEnd';
+import Reduce from 'lodash-es/reduce';
 import Util from 'util';
 import Webpack from 'webpack';
 
-import {getOutputDirectory, getTaskName} from '../../core/helpers';
-import {createConfiguration} from './configuration';
+import {getOutputDirectory, getTaskName, isDefined} from '../../core/helpers';
+import {ExtractedModules, createConfiguration} from './configuration';
 
 
 export function build(environment) {
@@ -32,6 +35,27 @@ export function build(environment) {
                 reject(err);
                 return;
             }
+
+            // Display extracted modules
+            if(!isDefined(ExtractedModules[environment])) {
+                reject(new Error('No modules were extracted'));
+                return;
+            }
+
+            let nameLength = Reduce(Object.keys(ExtractedModules[environment]), (result, name) => {
+                if(name.length > result) {
+                    return name.length;
+                }
+
+                return result;
+            }, 0);
+
+            ForEach(Object.keys(ExtractedModules[environment]).sort(), (name) => {
+                GulpUtil.log(
+                    GulpUtil.colors.green('%s => %s'),
+                    PadEnd(name, nameLength), ExtractedModules[environment][name]
+                );
+            });
 
             // Write statistics to file
             let statistics = JSON.stringify(stats.toJson('verbose'));
