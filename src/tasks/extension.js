@@ -1,10 +1,10 @@
 import Gulp from 'gulp';
-import GulpZip from 'gulp-zip';
 import Path from 'path';
 
 import Constants from '../core/constants';
 import Extension from '../core/extension';
 import {buildDistributionName, getTaskName} from '../core/helpers';
+import {createZip} from './core/helpers';
 
 
 export function createTask(environment) {
@@ -15,10 +15,16 @@ export function createTask(environment) {
         getTaskName(environment, 'manifest'),
         getTaskName(environment, 'webpack')
     ], () => {
-        // Create archive of build
-        return Gulp.src(Path.join(Constants.BuildDirectory.Root, environment, 'unpacked/**/*'))
-            .pipe(GulpZip(buildDistributionName(Extension.getVersion(environment))))
-            .pipe(Gulp.dest(Path.join(Constants.BuildDirectory.Root, environment)));
+        // Create archive
+        return createZip({
+            archive: Path.join(
+                Constants.BuildDirectory.Root, environment,
+                buildDistributionName(Extension.getVersion(environment))
+            ),
+
+            source: Path.join(Constants.BuildDirectory.Root, environment, 'unpacked'),
+            pattern: '**/*'
+        });
     });
 }
 

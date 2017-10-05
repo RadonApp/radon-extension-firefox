@@ -1,10 +1,10 @@
 import Gulp from 'gulp';
-import GulpZip from 'gulp-zip';
 import Path from 'path';
 
 import Constants from '../../core/constants';
 import Extension from '../../core/extension';
 import {buildDistributionName, getTaskName} from '../../core/helpers';
+import {createZip} from '../core/helpers';
 
 
 export function createTask(environment) {
@@ -13,12 +13,18 @@ export function createTask(environment) {
         getTaskName(environment, 'hybrid:wrapper'),
         getTaskName(environment, 'hybrid:webextension')
     ], () => {
-        // Create archive of build
-        return Gulp.src(Path.join(Constants.BuildDirectory.Root, environment, 'hybrid/**/*'))
-            .pipe(GulpZip(buildDistributionName(Extension.getVersion(environment), {
-                type: 'Hybrid'
-            })))
-            .pipe(Gulp.dest(Path.join(Constants.BuildDirectory.Root, environment)));
+        // Create archive
+        return createZip({
+            archive: Path.join(
+                Constants.BuildDirectory.Root, environment,
+                buildDistributionName(Extension.getVersion(environment), {
+                    type: 'Hybrid'
+                })
+            ),
+
+            source: Path.join(Constants.BuildDirectory.Root, environment, 'hybrid'),
+            pattern: '**/*'
+        });
     });
 }
 
