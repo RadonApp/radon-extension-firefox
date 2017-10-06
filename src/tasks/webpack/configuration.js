@@ -251,7 +251,7 @@ export function createConfiguration(environment, outputPath) {
             }),
 
             //
-            // Dependency Validator
+            // Development
             //
 
             ...(environment === 'development' ? [
@@ -259,12 +259,15 @@ export function createConfiguration(environment, outputPath) {
             ] : []),
 
             //
-            // Uglify
+            // Production
             //
 
             ...(environment === 'production' ? [
+                new Webpack.HashedModuleIdsPlugin(),
+                new Webpack.NamedChunksPlugin(),
+
                 new Webpack.optimize.UglifyJsPlugin()
-            ] : [])
+            ] : []),
         ],
 
         resolve: {
