@@ -69,5 +69,9 @@
     "simple-git": "^1.77.0",
     "style-loader": "^0.13.1",
     "yazl": "^2.4.2"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "test": "echo No tests available yet."
   }
 }
