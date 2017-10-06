@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - '7'
+script:
+  - npm run test
+  - npm run build
+deploy:
+  provider: releases
+  api_key:
+    secure: AKZefc+oQWOuXAK7ytS2tFgEmenpGP8gHijYA8BZNqA4HhwWWYYFWAHaGVrVGgEcnHAJBAqee/smw2przpka12IqccyfhvSng0uhPU7HvWdqO/VDW38d+JmneExiCvn1Nw7N+xwoX65FRn/jDlsooUeAqk0rn5Gj6CBbzk6yf7o=
+  skip_cleanup: true
+  file_glob: true
+  file:
+    - "build/production/Neon*.xpi"
+    - "build/production/Neon*.zip"
+  on:
+    repo: NeApp/neon-extension-firefox
+    tags: true
