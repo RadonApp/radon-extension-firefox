@@ -48,6 +48,11 @@ export function createChunks(environment) {
             ...getServices(modules, 'configuration'),
             'neon-extension-core/modules/background/messaging'
         ],
+        'background/messaging/services/library': [
+            ...Constants.CommonRequirements,
+            ...getServices(modules, 'configuration'),
+            'neon-extension-core/modules/background/messaging/services/library'
+        ],
         'background/messaging/services/scrobble': [
             ...Constants.CommonRequirements,
             ...getServices(modules, 'configuration'),

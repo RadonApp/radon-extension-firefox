@@ -134,6 +134,7 @@ export function createConfiguration(environment, outputPath) {
                     'background/migrate/migrate',
 
                     'background/messaging/messaging',
+                    'background/messaging/services/library',
                     'background/messaging/services/scrobble',
                     'background/messaging/services/storage'
                 ],
