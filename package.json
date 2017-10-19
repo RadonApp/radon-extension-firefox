@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-firefox",
-  "version": "1.4.0-beta.1",
+  "version": "1.5.0-beta.1",
   "dependencies": {
     "classnames": "2.2.5",
     "debug": "2.6.8",
@@ -29,13 +29,13 @@
     "warning": "2.1.0",
     "webpack": "2.6.0",
     "whatwg-fetch": "2.0.3",
-    "neon-extension-core": "1.4.0-beta.1",
-    "neon-extension-framework": "1.4.0-beta.1",
-    "neon-extension-browser-base": "1.4.0-beta.1",
-    "neon-extension-browser-firefox": "1.4.0-beta.1",
-    "neon-extension-browser-webextension": "1.4.0-beta.1",
-    "neon-extension-destination-lastfm": "1.4.0-beta.1",
-    "neon-extension-source-googlemusic": "1.4.0-beta.1"
+    "neon-extension-core": "1.5.0-beta.1",
+    "neon-extension-framework": "1.5.0-beta.1",
+    "neon-extension-browser-base": "1.5.0-beta.1",
+    "neon-extension-browser-firefox": "1.5.0-beta.1",
+    "neon-extension-browser-webextension": "1.5.0-beta.1",
+    "neon-extension-destination-lastfm": "1.5.0-beta.1",
+    "neon-extension-source-googlemusic": "1.5.0-beta.1"
   },
   "devDependencies": {
     "babel-core": "^7.0.0-beta.1",
