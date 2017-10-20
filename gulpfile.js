@@ -18,8 +18,7 @@ require('babel-register')({
 
             return true;
         }
-    ],
-    only: false
+    ]
 });
 
 require('./gulpfile.babel.js');
