@@ -5,6 +5,7 @@ import Path from 'path';
 import Set from 'lodash-es/set';
 import Webpack from 'webpack';
 
+import Browser from '../../core/browser';
 import Constants from '../../core/constants';
 import Extension from '../../core/extension';
 import Registry from '../../core/registry';
@@ -213,6 +214,9 @@ export function createConfiguration(environment, outputPath) {
             //
 
             new Webpack.DefinePlugin({
+                'neon.browser': JSON.stringify(
+                    Browser.toPlainObject(environment)
+                ),
                 'neon.manifests': JSON.stringify({
                     'neon-extension': Extension.toPlainObject(environment),
 

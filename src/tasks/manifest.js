@@ -1,14 +1,15 @@
 import CloneDeep from 'lodash-es/cloneDeep';
 import Filesystem from 'fs';
+import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
-import Merge from 'lodash-es/merge';
 import Mkdirp from 'mkdirp';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
+import Reduce from 'lodash-es/reduce';
 import Uniq from 'lodash-es/uniq';
 
+import Browser from '../core/browser';
 import Extension from '../core/extension';
-import Log from '../core/log';
 import Registry from '../core/registry';
 import {getOutputDirectory, getTaskName, isDefined} from '../core/helpers';
 
@@ -42,7 +43,7 @@ export function createTasks(environments) {
 
 function buildModuleManifests(environment) {
     return Promise.all(Registry.list(environment).map((module) => {
-        return getModuleManifest(module);
+        return buildModuleManifest(environment, module);
     }));
 }
 
@@ -91,10 +92,58 @@ function getExtensionManifest(environment) {
     };
 }
 
-function getModuleManifest(module) {
-    return {
+function buildManifest(environment, manifests) {
+    let current = CloneDeep(getExtensionManifest(environment));
+
+    // Merge module manifests
+    for(let i = 0; i < manifests.length; i++) {
+        let manifest = manifests[i];
+
+        current = {
+            ...current,
+            ...manifest,
+
+            icons: {
+                ...current.icons,
+                ...manifest.icons
+            },
+
+            content_scripts: [
+                ...current.content_scripts,
+                ...manifest.content_scripts
+            ],
+
+            web_accessible_resources: [
+                ...current.web_accessible_resources,
+                ...manifest.web_accessible_resources
+            ],
+
+            permissions: [
+                ...current.permissions,
+                ...manifest.permissions
+            ],
+
+            optional_permissions: [
+                ...current.optional_permissions,
+                ...manifest.optional_permissions
+            ],
+        };
+    }
+
+    // Sort arrays
+    current.permissions = Uniq(current.permissions).sort();
+    current.optional_permissions = Uniq(current.optional_permissions).sort();
+
+    current.web_accessible_resources = current.web_accessible_resources.sort();
+
+    return current;
+}
+
+function buildModuleManifest(environment, module) {
+    let manifest = {
         icons: {},
 
+        content_scripts: [],
         web_accessible_resources: [],
 
         // Retrieve module manifest properties
@@ -103,61 +152,58 @@ function getModuleManifest(module) {
             'web_accessible_resources'
         ]),
 
-        // Create content scripts definitions
-        content_scripts: module.manifest.content_scripts.map((contentScript) =>
-            createContentScript(contentScript)
-        ),
-
-        // Merge origins + permissions
-        permissions: [
-            ...module.manifest.origins,
-            ...module.manifest.permissions
-        ],
-
-        // Merge optional origins + permissions
-        optional_permissions: [
-            ...module.manifest.optional_origins,
-            ...module.manifest.optional_permissions
-        ]
+        // Build module permissions
+        ...buildModulePermissions(environment, module)
     };
-}
 
-function buildManifest(environment, manifests) {
-    let result = CloneDeep(getExtensionManifest(environment));
-
-    for(let i = 0; i < manifests.length; i++) {
-        let manifest = manifests[i];
-
-        // Merge with module manifest
-        result = {
-            ...result,
-            ...manifest,
-
-            icons: {
-                ...result.icons,
-                ...manifest.icons
-            },
-
-            content_scripts: [
-                ...result.content_scripts,
-                ...manifest.content_scripts
-            ],
-
-            // Sort resources
-            web_accessible_resources: [
-                ...result.web_accessible_resources,
-                ...manifest.web_accessible_resources
-            ].sort(),
-
-            // Remove duplicate permissions, and sort permissions
-            permissions: Uniq([
-                ...result.permissions,
-                ...manifest.permissions
-            ]).sort(),
-        };
+    // Content Scripts (if the browser doesn't support declarative content)
+    if(!Browser.supportsApi(environment, 'declarativeContent', 'permissions')) {
+        manifest.content_scripts = module.manifest.content_scripts.map((contentScript) =>
+            createContentScript(contentScript)
+        );
     }
 
-    return result;
+    return manifest;
+}
+
+function buildModulePermissions(environment, module) {
+    let permissions = [
+        ...module.manifest.origins,
+        ...module.manifest.permissions
+    ];
+
+    let optional_permissions = [
+        ...module.manifest.optional_origins,
+        ...module.manifest.optional_permissions
+    ];
+
+    // Declarative Content
+    if(Browser.supportsApi(environment, 'declarativeContent', 'permissions')) {
+        optional_permissions = optional_permissions.concat(getContentScriptPatterns(module));
+    }
+
+    // Destination / Source
+    if(['destination', 'source'].indexOf(module.type) >= 0) {
+        if(Browser.supportsApi(environment, 'permissions')) {
+            // Request permissions when the module is enabled
+            return {
+                permissions: [],
+                optional_permissions: optional_permissions.concat(permissions)
+            };
+        } else {
+            // Request permissions on extension installation
+            return {
+                permissions: permissions.concat(optional_permissions),
+                optional_permissions: []
+            };
+        }
+    }
+
+    // Unknown Module
+    return {
+        permissions,
+        optional_permissions
+    };
 }
 
 function writeManifest(environment, manifest) {
@@ -189,57 +235,15 @@ function writeManifest(environment, manifest) {
     });
 }
 
-function mergeModuleManifest(manifest, module) {
-    // Ensure module manifest exists
-    let manifestPath = Path.join(module.path, 'manifest.json');
-
-    if(!Filesystem.existsSync(manifestPath)) {
-        Log.moduleWarning(module.name,
-            'Module "%s" has no manifest', module.name
-        );
-        return manifest;
-    }
-
-    // Read module manifest
-    let moduleManifest = Merge({
-        content_scripts: [],
-        web_accessible_resources: [],
-
-        origins: [],
-        permissions: []
-    }, JSON.parse(Filesystem.readFileSync(manifestPath)));
-
-    // Return manifest merged with module properties
-    return {
-        ...manifest,
-
-        'content_scripts': [
-            ...manifest['content_scripts'],
-
-            ...moduleManifest['content_scripts']
-                .map((contentScript) => createContentScript(contentScript))
-                .filter((contentScript) => contentScript !== null)
-        ],
-
-        'permissions': [
-            ...manifest['permissions'],
-            ...moduleManifest['origins'],
-            ...moduleManifest['permissions']
-        ],
-
-        'web_accessible_resources': [
-            ...manifest['web_accessible_resources'],
-            ...moduleManifest['web_accessible_resources']
-        ],
-    };
-}
-
 export function createContentScript(contentScript) {
     if(!isDefined(contentScript) || !isDefined(contentScript.conditions)) {
         throw new Error('Invalid content script definition');
     }
 
     return {
+        css: [],
+        js: [],
+
         matches: contentScript.conditions.map((condition) => {
             if(!isDefined(condition) || !isDefined(condition.pattern)) {
                 throw new Error('Invalid content script condition');
@@ -248,9 +252,26 @@ export function createContentScript(contentScript) {
             return condition.pattern;
         }),
 
-        css: contentScript.css || [],
-        js: contentScript.js || []
+        ...Pick(contentScript, [
+            'css',
+            'js'
+        ])
     };
+}
+
+export function getContentScriptPatterns(module) {
+    return Reduce(module.manifest.content_scripts, (result, contentScript) => {
+        ForEach(contentScript.conditions, (condition) => {
+            if(!isDefined(condition) || !isDefined(condition.pattern)) {
+                throw new Error('Invalid content script condition');
+            }
+
+            // Include pattern in result
+            result.push(condition.pattern);
+        });
+
+        return result;
+    }, []);
 }
 
 export default {
