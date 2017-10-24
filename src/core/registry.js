@@ -115,7 +115,7 @@ export class Registry {
     }
 
     get(environment, name) {
-        return this._modules[environment][name];
+        return (this._modules[environment] || {})[name] || null;
     }
 
     list(environment, options) {
@@ -131,7 +131,7 @@ export class Registry {
         }
 
         // Filter modules
-        let modules = Filter(this._modules[environment], options.filter);
+        let modules = Filter(this._modules[environment] || {}, options.filter);
 
         // Sort modules (if enabled)
         if(isDefined(options.sort) && options.sort !== false) {
@@ -158,7 +158,7 @@ export class Registry {
     }
 
     toPlainObject(environment) {
-        let modules = MapValues(this._modules[environment], (module) => Pick(module, [
+        let modules = MapValues(this._modules[environment] || {}, (module) => Pick(module, [
             'name',
             'type',
             'key',
