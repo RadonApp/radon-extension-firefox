@@ -88,12 +88,14 @@ export class Extension {
         return this._dirty[environment] || this._metadata.repository.dirty || false;
     }
 
-    getVersion(environment) {
+    getVersion(environment, options) {
         if(!this._fetched) {
             throw new Error('Extension manifest hasn\'t been fetched yet');
         }
 
-        let dirty = this.isDirty(environment);
+        options = Merge({
+            plain: false
+        }, options || {});
 
         // Retrieve current version
         let version = this._metadata.version;
@@ -101,6 +103,14 @@ export class Extension {
         if(!isDefined(version)) {
             return null;
         }
+
+        // Return plain version (if requests)
+        if(options.plain) {
+            return version.substring(0, version.indexOf('-'));
+        }
+
+        // Retrieve repository status
+        let dirty = this.isDirty(environment);
 
         // Ahead / Behind
         if(this.isAhead(environment)) {
