@@ -1,6 +1,24 @@
 {
   "name": "neon-extension-firefox",
   "version": "1.5.1-beta.1",
+  "description": "Neon Extension for Firefox (formerly Google Music Scrobbler)",
+  "keywords": ["neon", "neon-extension", "firefox"],
+  "homepage": "https://github.com/NeApp/neon-extension",
+  "author": "Dean Gardiner <me@dgardiner.net>",
+  "license": "GPL-3.0",
+  "main": "./src",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/NeApp/neon-extension/issues"
+  },
+  "repostitory": {
+    "type": "git",
+    "url": "https://github.com/NeApp/neon-extension-firefox"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "test": "echo No tests available yet."
+  },
   "dependencies": {
     "classnames": "2.2.5",
     "debug": "2.6.8",
@@ -69,9 +87,5 @@
     "simple-git": "^1.77.0",
     "style-loader": "^0.13.1",
     "yazl": "^2.4.2"
-  },
-  "scripts": {
-    "build": "gulp build",
-    "test": "echo No tests available yet."
   }
 }
