@@ -2,7 +2,11 @@
   "name": "neon-extension-firefox",
   "version": "1.5.1-beta.3",
   "description": "Neon Extension for Firefox (formerly Google Music Scrobbler)",
-  "keywords": ["neon", "neon-extension", "firefox"],
+  "keywords": [
+    "neon",
+    "neon-extension",
+    "firefox"
+  ],
   "homepage": "https://github.com/NeApp/neon-extension",
   "author": "Dean Gardiner <me@dgardiner.net>",
   "license": "GPL-3.0",
