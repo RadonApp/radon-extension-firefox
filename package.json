@@ -20,6 +20,7 @@
     "test": "echo No tests available yet."
   },
   "dependencies": {
+    "bowser": "1.8.1",
     "classnames": "2.2.5",
     "debug": "2.6.8",
     "deep-equal": "1.0.1",
