@@ -275,6 +275,12 @@ export function createConfiguration(environment, outputPath) {
             ] : []),
         ],
 
+        externals: {
+            'jquery':    'jQuery',
+            'react':     'React',
+            'react-dom': 'ReactDOM'
+        },
+
         resolve: {
             modules: getModulePaths(environment),
 
