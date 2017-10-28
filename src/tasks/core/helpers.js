@@ -27,7 +27,7 @@ export function createZip(options) {
                 }
 
                 zip.addFile(files[i], Path.relative(options.source, files[i]), {
-                    mtime: options.mtime || new Date(Date.UTC(2017, 0))
+                    mtime: options.mtime || new Date(2017, 0)
                 });
             }
 
