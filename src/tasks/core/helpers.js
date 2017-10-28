@@ -1,11 +1,15 @@
 import Filesystem from 'fs';
 import Glob from 'glob';
+import Merge from 'lodash-es/merge';
 import Path from 'path';
 import Yazl from 'yazl';
 
 
 export function createZip(options) {
-    options = options || {};
+    options = Merge({
+        mode: 100664,
+        mtime: new Date(2017, 0)
+    }, options || {});
 
     return new Promise((resolve, reject) => {
         Glob(options.source + '/' + options.pattern, (err, files) => {
@@ -27,7 +31,8 @@ export function createZip(options) {
                 }
 
                 zip.addFile(files[i], Path.relative(options.source, files[i]), {
-                    mtime: options.mtime || new Date(2017, 0)
+                    mode: parseInt(options.mode, 8),
+                    mtime: options.mtime
                 });
             }
 
