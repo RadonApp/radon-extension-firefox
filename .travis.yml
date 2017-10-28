@@ -5,6 +5,7 @@ before_install:
   - npm install -g npm@'>=5.5.1'
 script:
   - npm run test
+  - git status
   - npm run build
 deploy:
   provider: releases
