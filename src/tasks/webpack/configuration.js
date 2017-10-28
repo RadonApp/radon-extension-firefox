@@ -487,12 +487,12 @@ function getModuleDetails(environment, path) {
 }
 
 function getModuleName(basePath, path) {
-    path = Path.relative(basePath, path);
+    path = Path.normalize(Path.relative(basePath, path));
 
-    let end = path.indexOf('\\');
+    let end = path.indexOf(Path.sep);
 
     if(path[0] === '@') {
-        end = path.indexOf('\\', end + 1);
+        end = path.indexOf(Path.sep, end + 1);
     }
 
     return path.substring(0, end);
