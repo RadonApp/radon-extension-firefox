@@ -9,8 +9,7 @@ import {getTaskName} from '../core/helpers';
 export function createTask(environment) {
     Gulp.task(getTaskName(environment, 'build:package'), [
         getTaskName(environment, 'clean'),
-        getTaskName(environment, 'extension'),
-        getTaskName(environment, 'hybrid')
+        getTaskName(environment, 'extension')
     ]);
 
     Gulp.task(getTaskName(environment, 'build:hashsum'), [
