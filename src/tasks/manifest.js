@@ -6,6 +6,7 @@ import Mkdirp from 'mkdirp';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
 import Reduce from 'lodash-es/reduce';
+import Remove from 'lodash-es/remove';
 import Uniq from 'lodash-es/uniq';
 
 import Browser from '../core/browser';
@@ -26,7 +27,8 @@ export function build(environment) {
 export function createTask(environment) {
     Gulp.task(getTaskName(environment, 'manifest'), [
         getTaskName(environment, 'clean'),
-        getTaskName(environment, 'discover')
+        getTaskName(environment, 'discover'),
+        getTaskName(environment, 'webpack')
     ], (done) => {
         build(environment).then(
             () => done(),
@@ -94,6 +96,7 @@ function getExtensionManifest(environment) {
 
 function buildManifest(environment, manifests) {
     let current = CloneDeep(getExtensionManifest(environment));
+    let outputPath = getOutputDirectory(environment, 'unpacked');
 
     // Merge module manifests
     for(let i = 0; i < manifests.length; i++) {
@@ -128,6 +131,11 @@ function buildManifest(environment, manifests) {
                 ...manifest.optional_permissions
             ],
         };
+    }
+
+    // Remove background scripts that don't exist
+    if(isDefined(current.background.scripts)) {
+        Remove(current.background.scripts, (path) => !Filesystem.existsSync(Path.join(outputPath, path)));
     }
 
     // Sort arrays

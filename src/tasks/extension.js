@@ -12,8 +12,8 @@ export function createTask(environment) {
         getTaskName(environment, 'clean'),
         getTaskName(environment, 'discover'),
         getTaskName(environment, 'assets'),
-        getTaskName(environment, 'manifest'),
-        getTaskName(environment, 'webpack')
+        getTaskName(environment, 'webpack'),
+        getTaskName(environment, 'manifest')
     ], () => {
         // Create archive
         return createZip({
