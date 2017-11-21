@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-firefox",
-  "version": "1.5.8-beta.3",
+  "version": "1.5.8",
   "description": "Neon Extension for Firefox (formerly Google Music Scrobbler)",
   "keywords": [
     "neon",
