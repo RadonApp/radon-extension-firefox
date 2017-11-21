@@ -104,10 +104,13 @@ export class Extension {
             return null;
         }
 
-        // Return plain version (if requests)
+        // Return plain version (if requested)
         if(options.plain) {
             return version.substring(0, version.indexOf('-'));
         }
+
+        // Format version (for AMO)
+        version = version.replace(/-(\w)\w+\.(\d+)$/g, '$1$2');
 
         // Retrieve repository status
         let dirty = this.isDirty(environment);
