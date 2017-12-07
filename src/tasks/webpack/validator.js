@@ -1,3 +1,4 @@
+import GulpUtil from 'gulp-util';
 import IsNil from 'lodash-es/isNil';
 import SemanticVersion from 'semver';
 import Set from 'lodash-es/set';
@@ -159,12 +160,16 @@ export class Validator {
                 continue;
             }
 
-            if(!matched[name]) {
-                if(!IsNil(moduleName)) {
-                    throw new Error(prefix + ' "' + name + '" for "' + moduleName + '" is not required');
-                }
+            // Check if module was used
+            if(matched[name]) {
+                continue;
+            }
 
-                throw new Error(prefix + ' "' + name + '" is not required');
+            // Display warning
+            if(!IsNil(moduleName)) {
+                GulpUtil.log(GulpUtil.colors.yellow(prefix + ' "' + name + '" for "' + moduleName + '" is not required'));
+            } else {
+                GulpUtil.log(GulpUtil.colors.yellow(prefix + ' "' + name + '" is not required'));
             }
         }
     }
