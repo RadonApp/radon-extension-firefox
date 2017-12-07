@@ -90,7 +90,16 @@ export function createConfiguration(environment, outputPath) {
                             loader: 'babel-loader',
                             options: {
                                 cacheDirectory: Path.join(Constants.PackagePath, '.babel/cache'),
-                                presets: ['es2015', 'react']
+
+                                plugins: [
+                                    "transform-class-properties",
+                                    "transform-object-rest-spread"
+                                ],
+
+                                presets: [
+                                    'es2015',
+                                    'react'
+                                ]
                             },
                         }
                     ]
