@@ -1,8 +1,7 @@
 import Filesystem from 'fs';
+import IsNil from 'lodash-es/isNil';
 import Path from 'path';
 import SimpleGit from 'simple-git';
-
-import {isDefined} from './helpers';
 
 
 export class Git {
@@ -11,7 +10,7 @@ export class Git {
             // Build version
             let version;
 
-            if(isDefined(status.tag)) {
+            if(!IsNil(status.tag)) {
                 version = status.tag.substring(1);
 
                 if(status.ahead > 0) {

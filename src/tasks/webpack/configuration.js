@@ -1,5 +1,6 @@
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import Filesystem from 'fs';
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
 import Set from 'lodash-es/set';
@@ -10,7 +11,6 @@ import Constants from '../../core/constants';
 import Extension from '../../core/extension';
 import Registry from '../../core/registry';
 import Validator from './validator';
-import {isDefined} from '../../core/helpers';
 import {createChunks} from './chunks';
 
 
@@ -373,11 +373,11 @@ function shouldExtractModule(module, count, options) {
     }, options || {});
 
     // Validate options
-    if(!isDefined(options.chunk)) {
+    if(IsNil(options.chunk)) {
         throw new Error('Missing required option: chunk');
     }
 
-    if(!isDefined(options.environment)) {
+    if(IsNil(options.environment)) {
         throw new Error('Missing required option: environment');
     }
 
@@ -401,14 +401,14 @@ function shouldExtractModule(module, count, options) {
     }
 
     // Ignore excluded/invalid modules
-    if(!isDefined(module.userRequest) || !include) {
+    if(IsNil(module.userRequest) || !include) {
         return include;
     }
 
     // Shorten request
     let request = module.userRequest;
 
-    if(isDefined(details.name)) {
+    if(!IsNil(details.name)) {
         let start = request.indexOf(details.name);
 
         if(start >= 0) {
@@ -423,7 +423,7 @@ function shouldExtractModule(module, count, options) {
 }
 
 function getModuleDetails(environment, path) {
-    if(!isDefined(path)) {
+    if(IsNil(path)) {
         return null;
     }
 
@@ -431,7 +431,7 @@ function getModuleDetails(environment, path) {
     let module = Registry.match(environment, path);
 
     // Module
-    if(isDefined(module)) {
+    if(!IsNil(module)) {
         if(path.startsWith(Path.resolve(module.path, 'node_modules'))) {
             return {
                 type: 'dependency',
@@ -503,7 +503,7 @@ function isSharedDependency(name) {
         return false;
     }
 
-    return isDefined(Extension.package.dependencies[name]);
+    return !IsNil(Extension.package.dependencies[name]);
 }
 
 function generateModuleIdentifier(module, fallback) {

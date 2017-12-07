@@ -6,14 +6,14 @@ import Constants from './constants';
 export function buildDistributionName(version, options) {
     options = options || {};
 
-    if(!isDefined(version)) {
+    if(IsNil(version)) {
         throw new Error('Missing required parameter: version');
     }
 
     // Build distribution name
     let tags = ['Neon'];
 
-    if(isDefined(options.type)) {
+    if(!IsNil(options.type)) {
         tags.push(options.type);
     }
 
@@ -40,8 +40,4 @@ export function getOutputDirectory(environment, ...args) {
 
 export function getTaskName(environment, ...args) {
     return args.join(':') + ':' + environment;
-}
-
-export function isDefined(value) {
-    return typeof value !== 'undefined' && value !== null;
 }

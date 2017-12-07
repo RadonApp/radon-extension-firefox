@@ -1,8 +1,8 @@
+import IsNil from 'lodash-es/isNil';
 import Pick from 'lodash-es/pick';
 
 import Extension from './extension';
 import Registry from './registry';
-import {isDefined} from './helpers';
 
 
 export class Browser {
@@ -42,7 +42,7 @@ export class Browser {
     }
 
     _getModuleName() {
-        if(!isDefined(Extension.package.name)) {
+        if(IsNil(Extension.package.name)) {
             throw new Error('No "name" found in package.json');
         }
 

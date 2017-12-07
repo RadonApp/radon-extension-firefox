@@ -1,4 +1,4 @@
-import {isDefined} from '../../../core/helpers';
+import IsNil from 'lodash-es/isNil';
 
 
 export default class ValidatorPlugin {
@@ -14,7 +14,7 @@ export default class ValidatorPlugin {
                 let count = 0;
 
                 chunks.forEach((chunk) => {
-                    if(!isDefined(chunk.name)) {
+                    if(IsNil(chunk.name)) {
                         return;
                     }
 

@@ -1,10 +1,10 @@
+import IsNil from 'lodash-es/isNil';
 import SemanticVersion from 'semver';
 import Set from 'lodash-es/set';
 
 import Extension from '../../core/extension';
 import Registry from '../../core/registry';
 import ValidatorPlugin from './plugins/validator';
-import {isDefined} from '../../core/helpers';
 
 
 const DependencyVersionRegex = /^\d+\.\d+\.\d+(\-\w+(\.\d+)?)?$/g;
@@ -20,7 +20,7 @@ export class Validator {
     }
 
     processModule(environment, module) {
-        if(!isDefined(environment) || !isDefined(module) || !isDefined(module.userRequest)) {
+        if(IsNil(environment) || IsNil(module) || IsNil(module.userRequest)) {
             return;
         }
 
@@ -31,14 +31,14 @@ export class Validator {
     }
 
     processModuleDependency(environment, source, request) {
-        if(!isDefined(environment) || !isDefined(request)) {
+        if(IsNil(environment) || IsNil(request)) {
             return false;
         }
 
         // Retrieve dependency name
         let name = this._getDependencyName(request);
 
-        if(!isDefined(name) || name.startsWith('neon-extension-')) {
+        if(IsNil(name) || name.startsWith('neon-extension-')) {
             return false;
         }
 
@@ -49,11 +49,11 @@ export class Validator {
         let module;
         let moduleDependency;
 
-        if(isDefined(source)) {
+        if(!IsNil(source)) {
             module = Registry.match(environment, source);
         }
 
-        if(isDefined(module)) {
+        if(!IsNil(module)) {
             moduleDependency = module.package.dependencies[name];
         }
 
@@ -61,8 +61,8 @@ export class Validator {
         let dependency = moduleDependency || extensionDependency;
 
         // Ensure dependency definition was found
-        if(!isDefined(dependency)) {
-            if(isDefined(module)) {
+        if(IsNil(dependency)) {
+            if(!IsNil(module)) {
                 throw new Error('Unable to find "' + name + '" dependency for "' + module.name + '"');
             }
 
@@ -71,7 +71,7 @@ export class Validator {
 
         // Ensure dependency is pinned to a version
         if(!dependency.match(DependencyVersionRegex)) {
-            if(isDefined(moduleDependency)) {
+            if(!IsNil(moduleDependency)) {
                 throw new Error(
                     'Dependency "' + name + '" for "' + module.name + '" ' +
                     'should be pinned to a version (found: ' + dependency + ')'
@@ -85,7 +85,7 @@ export class Validator {
         }
 
         // Ensure dependencies aren't duplicated
-        if(isDefined(moduleDependency) && isDefined(extensionDependency)) {
+        if(!IsNil(moduleDependency) && !IsNil(extensionDependency)) {
             throw new Error(
                 'Dependency "' + name + '" has been duplicated ' +
                 '(extension: ' + extensionDependency + ', ' + module.name + ': ' + moduleDependency + ')'
@@ -93,31 +93,31 @@ export class Validator {
         }
 
         // Mark dependency
-        if(isDefined(moduleDependency)) {
+        if(!IsNil(moduleDependency)) {
             Set(this.dependencies, [environment, module.name, name], true);
         } else {
             Set(this.dependencies, [environment, null, name], true);
         }
 
         // Validate module dependency
-        if(isDefined(module)) {
+        if(!IsNil(module)) {
             let modulePeerDependency = module.package.peerDependencies[name];
 
             // Mark peer dependency
             Set(this.peerDependencies, [environment, module.name, name], true);
 
             // Ensure peer dependency is defined
-            if(isDefined(extensionDependency) && !isDefined(modulePeerDependency)) {
+            if(!IsNil(extensionDependency) && IsNil(modulePeerDependency)) {
                 throw new Error('"' + name + '" should be defined as a peer dependency in "' + module.name + '"');
             }
 
             // Ensure peer dependency is a caret range
-            if(isDefined(extensionDependency) && modulePeerDependency.indexOf('^') !== 0) {
+            if(!IsNil(extensionDependency) && modulePeerDependency.indexOf('^') !== 0) {
                 throw new Error('"' + name + '" peer dependency in "' + module.name + '" should be a caret range');
             }
 
             // Ensure extension dependency matches peer dependency range
-            if(isDefined(extensionDependency) && !SemanticVersion.satisfies(extensionDependency, modulePeerDependency)) {
+            if(!IsNil(extensionDependency) && !SemanticVersion.satisfies(extensionDependency, modulePeerDependency)) {
                 throw new Error(
                     '"' + name + '" peer dependency in "' + module.name + '" (' + modulePeerDependency + ')' +
                     ' is not satisfied by extension version: ' + extensionDependency
@@ -147,7 +147,7 @@ export class Validator {
     }
 
     _checkDependencies(prefix, current, matched, moduleName) {
-        if(!isDefined(prefix) || !isDefined(current)) {
+        if(IsNil(prefix) || IsNil(current)) {
             return;
         }
 
@@ -160,7 +160,7 @@ export class Validator {
             }
 
             if(!matched[name]) {
-                if(isDefined(moduleName)) {
+                if(!IsNil(moduleName)) {
                     throw new Error(prefix + ' "' + name + '" for "' + moduleName + '" is not required');
                 }
 

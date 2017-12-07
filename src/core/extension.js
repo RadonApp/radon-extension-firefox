@@ -1,11 +1,11 @@
 import Filesystem from 'fs';
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
 
 import Constants from './constants';
 import Git from './git';
-import {isDefined} from './helpers';
 
 
 export class Extension {
@@ -100,7 +100,7 @@ export class Extension {
         // Retrieve current version
         let version = this._metadata.version;
 
-        if(!isDefined(version)) {
+        if(IsNil(version)) {
             return null;
         }
 
@@ -117,7 +117,7 @@ export class Extension {
 
         // Ahead / Behind
         if(this.isAhead(environment)) {
-            if(isDefined(this._metadata.repository.commit)) {
+            if(!IsNil(this._metadata.repository.commit)) {
                 version += '-' + this._metadata.repository.commit.substring(0, 7);
             } else {
                 dirty = true;

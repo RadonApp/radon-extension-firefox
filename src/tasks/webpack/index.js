@@ -2,13 +2,14 @@ import Filesystem from 'fs';
 import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
 import GulpUtil from 'gulp-util';
+import IsNil from 'lodash-es/isNil';
 import Mkdirp from 'mkdirp';
 import PadEnd from 'lodash-es/padEnd';
 import Reduce from 'lodash-es/reduce';
 import Util from 'util';
 import Webpack from 'webpack';
 
-import {getOutputDirectory, getTaskName, isDefined} from '../../core/helpers';
+import {getOutputDirectory, getTaskName} from '../../core/helpers';
 import {ExtractedModules, createConfiguration} from './configuration';
 
 
@@ -37,7 +38,7 @@ export function build(environment) {
             }
 
             // Display extracted modules
-            if(!isDefined(ExtractedModules[environment])) {
+            if(IsNil(ExtractedModules[environment])) {
                 reject(new Error('No modules were extracted'));
                 return;
             }

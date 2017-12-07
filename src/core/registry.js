@@ -1,6 +1,7 @@
 import Filesystem from 'fs';
 import Filter from 'lodash-es/filter';
 import GulpUtil from 'gulp-util';
+import IsNil from 'lodash-es/isNil';
 import MapValues from 'lodash-es/mapValues';
 import Merge from 'lodash-es/merge';
 import PadEnd from 'lodash-es/padEnd';
@@ -12,7 +13,6 @@ import SortBy from 'lodash-es/sortBy';
 import Constants from './constants';
 import Extension from './extension';
 import Git from './git';
-import {isDefined} from '../core/helpers';
 
 
 export class Registry {
@@ -126,7 +126,7 @@ export class Registry {
         }, options || {});
 
         // Enable "type" filter
-        if(isDefined(options.type)) {
+        if(!IsNil(options.type)) {
             options.filter.type = options.type;
         }
 
@@ -134,7 +134,7 @@ export class Registry {
         let modules = Filter(this._modules[environment] || {}, options.filter);
 
         // Sort modules (if enabled)
-        if(isDefined(options.sort) && options.sort !== false) {
+        if(!IsNil(options.sort) && options.sort !== false) {
             modules = SortBy(modules, options.sort === true ? 'name' : options.sort);
         }
 
@@ -279,9 +279,9 @@ export class Registry {
     _logModuleRegistration(module, path) {
         let color = GulpUtil.colors.green;
 
-        if(isDefined(module.repository) && module.repository.dirty) {
+        if(!IsNil(module.repository) && module.repository.dirty) {
             color = GulpUtil.colors.red;
-        } else if(isDefined(module.repository) && module.repository.ahead) {
+        } else if(!IsNil(module.repository) && module.repository.ahead) {
             color = GulpUtil.colors.yellow;
         }
 

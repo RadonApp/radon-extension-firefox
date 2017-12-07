@@ -1,8 +1,8 @@
 import GulpUtil from 'gulp-util';
+import IsNil from 'lodash-es/isNil';
 import Path from 'path';
 
 import Constants from '../../core/constants';
-import {isDefined} from '../../core/helpers';
 
 
 let LoggedModules = {};
@@ -30,7 +30,7 @@ export function getPackagePath(modulePath) {
 }
 
 export function logModule(color, name, modulePath, count, suffix) {
-    if(!isDefined(modulePath)) {
+    if(IsNil(modulePath)) {
         return;
     }
 

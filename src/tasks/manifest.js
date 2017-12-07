@@ -2,6 +2,7 @@ import CloneDeep from 'lodash-es/cloneDeep';
 import Filesystem from 'fs';
 import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
+import IsNil from 'lodash-es/isNil';
 import Mkdirp from 'mkdirp';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
@@ -12,7 +13,7 @@ import Uniq from 'lodash-es/uniq';
 import Browser from '../core/browser';
 import Extension from '../core/extension';
 import Registry from '../core/registry';
-import {getOutputDirectory, getTaskName, isDefined} from '../core/helpers';
+import {getOutputDirectory, getTaskName} from '../core/helpers';
 
 
 export function build(environment) {
@@ -134,7 +135,7 @@ function buildManifest(environment, manifests) {
     }
 
     // Remove background scripts that don't exist
-    if(isDefined(current.background.scripts)) {
+    if(!IsNil(current.background.scripts)) {
         Remove(current.background.scripts, (path) => !Filesystem.existsSync(Path.join(outputPath, path)));
     }
 
@@ -244,7 +245,7 @@ function writeManifest(environment, manifest) {
 }
 
 export function createContentScript(contentScript) {
-    if(!isDefined(contentScript) || !isDefined(contentScript.conditions)) {
+    if(IsNil(contentScript) || IsNil(contentScript.conditions)) {
         throw new Error('Invalid content script definition');
     }
 
@@ -253,7 +254,7 @@ export function createContentScript(contentScript) {
         js: [],
 
         matches: contentScript.conditions.map((condition) => {
-            if(!isDefined(condition) || !isDefined(condition.pattern)) {
+            if(IsNil(condition) || IsNil(condition.pattern)) {
                 throw new Error('Invalid content script condition');
             }
 
@@ -270,7 +271,7 @@ export function createContentScript(contentScript) {
 export function getContentScriptPatterns(module) {
     return Reduce(module.manifest.content_scripts, (result, contentScript) => {
         ForEach(contentScript.conditions, (condition) => {
-            if(!isDefined(condition) || !isDefined(condition.pattern)) {
+            if(IsNil(condition) || IsNil(condition.pattern)) {
                 throw new Error('Invalid content script condition');
             }
 
