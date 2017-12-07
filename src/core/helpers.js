@@ -1,3 +1,4 @@
+import IsNil from 'lodash-es/isNil';
 import Path from 'path';
 
 import Constants from './constants';
