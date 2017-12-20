@@ -1,7 +1,7 @@
 var path = require('path');
 
 
-require('babel-register')({
+require('@babel/register')({
     ignore: [
         function(filename) {
             filename = path.resolve(__dirname, filename);
