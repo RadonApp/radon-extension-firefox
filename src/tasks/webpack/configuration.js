@@ -92,15 +92,15 @@ export function createConfiguration(environment, outputPath) {
                                 cacheDirectory: Path.join(Constants.PackagePath, '.babel/cache'),
 
                                 plugins: [
-                                    "transform-class-properties",
-                                    "transform-object-rest-spread"
+                                    '@babel/proposal-class-properties',
+                                    '@babel/proposal-object-rest-spread'
                                 ],
 
                                 presets: [
-                                    'es2015',
-                                    'react'
+                                    '@babel/env',
+                                    '@babel/react'
                                 ]
-                            },
+                            }
                         }
                     ]
                 },
