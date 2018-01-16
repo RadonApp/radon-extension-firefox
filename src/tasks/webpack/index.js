@@ -37,6 +37,15 @@ export function build(environment) {
                 return;
             }
 
+            // Log build statistics
+            GulpUtil.log(stats.toString('normal'));
+
+            // Reject if there is any errors
+            if(stats.hasErrors()) {
+                reject(new Error('Build failed'));
+                return;
+            }
+
             // Display extracted modules
             if(IsNil(ExtractedModules[environment])) {
                 reject(new Error('No modules were extracted'));
@@ -69,7 +78,7 @@ export function build(environment) {
                     return;
                 }
 
-                resolve(stats);
+                resolve();
             });
         });
     });
@@ -80,13 +89,7 @@ export function createTask(environment) {
         getTaskName(environment, 'clean'),
         getTaskName(environment, 'discover')
     ], (done) => {
-        build(environment).then(
-            (stats) => {
-                GulpUtil.log(stats.toString('normal'));
-                done();
-            },
-            done
-        );
+        build(environment).then(done, done);
     });
 }
 
