@@ -18,7 +18,7 @@
   "engines": {
     "npm": ">=5.5.1"
   },
-  "repostitory": {
+  "repository": {
     "type": "git",
     "url": "https://github.com/NeApp/neon-extension-firefox"
   },
