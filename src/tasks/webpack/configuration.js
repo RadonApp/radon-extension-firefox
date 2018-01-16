@@ -291,7 +291,12 @@ export function createConfiguration(environment, outputPath) {
         },
 
         resolve: {
-            modules: getModulePaths(environment),
+            modules: [
+                'node_modules',
+
+                // Shared modules
+                Path.resolve(Constants.PackagePath, 'node_modules')
+            ],
 
             alias: {
                 ...getModuleAliases(environment),
