@@ -106,7 +106,7 @@ export class Extension {
 
         // Return plain version (if requested)
         if(options.plain) {
-            return version.substring(0, version.indexOf('-'));
+            return version.substring(0, version.indexOf('-')) || version;
         }
 
         // Format version (for AMO)
