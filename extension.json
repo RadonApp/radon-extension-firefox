@@ -23,7 +23,6 @@
       "background/messaging/services/storage.js",
       "background/messaging/services/scrobble.js",
 
-      "background/callback/callback.js",
       "background/main/main.js",
       "background/migrate/migrate.js"
     ]

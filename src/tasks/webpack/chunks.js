@@ -22,11 +22,6 @@ export function createChunks(environment) {
 
     // Create modules
     return {
-        'background/callback/callback': [
-            ...Constants.CommonRequirements,
-            ...getServices(modules, 'configuration'),
-            'neon-extension-core/modules/background/callback'
-        ],
         'background/main/main': [
             ...Constants.CommonRequirements,
             ...getServices(modules, 'configuration'),

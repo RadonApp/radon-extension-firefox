@@ -139,7 +139,6 @@ export function createConfiguration(environment, outputPath) {
                 name: 'background/common',
 
                 chunks: [
-                    'background/callback/callback',
                     'background/main/main',
                     'background/migrate/migrate',
 
