@@ -76,10 +76,12 @@ export class Git {
             .then((result) => this._getStatus(repository).then((status) => ({
                 ...result,
 
+                branch: status.current,
                 dirty: status.files.length > 0
             }), () => ({
                 ...result,
 
+                branch: null,
                 dirty: false
             })));
     }

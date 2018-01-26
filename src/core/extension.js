@@ -88,6 +88,14 @@ export class Extension {
         return this._dirty[environment] || this._metadata.repository.dirty || false;
     }
 
+    getBranch() {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return this._metadata.repository.branch;
+    }
+
     getCommit() {
         if(!this._fetched) {
             throw new Error('Extension manifest hasn\'t been fetched yet');
@@ -135,6 +143,10 @@ export class Extension {
 
         // Ahead / Behind
         if(this.isAhead(environment)) {
+            // Append branch (with special characters replaced with "-")
+            version += '-' + this.getBranch().replace(/[^A-Za-z0-9]+/g, '-');
+
+            // Append commit sha (if defined)
             let commit = this.getCommitShort();
 
             if(!IsNil(commit)) {
