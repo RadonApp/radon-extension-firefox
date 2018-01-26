@@ -13,6 +13,10 @@ export class Travis {
         return branch;
     }
 
+    get build_number() {
+        return Process.env['TRAVIS_BUILD_NUMBER'] || null;
+    }
+
     get tag() {
         return Process.env['TRAVIS_TAG'] || null;
     }
