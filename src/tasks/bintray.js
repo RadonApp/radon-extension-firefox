@@ -49,7 +49,7 @@ export function buildDescriptor(environment) {
         },
 
         'version': {
-            'name': Extension.getVersionName(environment),
+            'name': Extension.getVersion(environment),
             'vcs_tag': Extension.getCommit()
         },
 
