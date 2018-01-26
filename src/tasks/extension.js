@@ -12,6 +12,7 @@ export function createTask(environment) {
         getTaskName(environment, 'clean'),
         getTaskName(environment, 'discover'),
         getTaskName(environment, 'assets'),
+        getTaskName(environment, 'bintray'),
         getTaskName(environment, 'webpack'),
         getTaskName(environment, 'manifest')
     ], () => {

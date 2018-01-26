@@ -1,6 +1,7 @@
 import Gulp from 'gulp';
 
 import AssetsTask from './src/tasks/assets';
+import BintrayTask from './src/tasks/bintray';
 import BuildTask from './src/tasks/build';
 import CleanTask from './src/tasks/clean';
 import DiscoverTask from './src/tasks/discover';
@@ -18,6 +19,7 @@ Gulp.task('build', ['build:production']);
 
 // Create tasks
 AssetsTask.createTasks(Environments);
+BintrayTask.createTasks(Environments);
 BuildTask.createTasks(Environments);
 CleanTask.createTasks(Environments);
 DiscoverTask.createTasks(Environments);

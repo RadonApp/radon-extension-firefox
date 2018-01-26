@@ -9,14 +9,12 @@ export const BuildDirectory = {
 
     Development: {
         Root:       Path.join(PackagePath, 'build', 'development'),
-        Unpacked:   Path.join(PackagePath, 'build', 'development', 'unpacked'),
-        Hybrid:     Path.join(PackagePath, 'build', 'development', 'hybrid')
+        Unpacked:   Path.join(PackagePath, 'build', 'development', 'unpacked')
     },
 
     Production: {
         Root:       Path.join(PackagePath, 'build', 'production'),
-        Unpacked:   Path.join(PackagePath, 'build', 'production', 'unpacked'),
-        Hybrid:     Path.join(PackagePath, 'build', 'production', 'hybrid')
+        Unpacked:   Path.join(PackagePath, 'build', 'production', 'unpacked')
     }
 };
 
