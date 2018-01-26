@@ -6,6 +6,7 @@ import Pick from 'lodash-es/pick';
 
 import Constants from './constants';
 import Git from './git';
+import Travis from './travis';
 
 
 export class Extension {
@@ -49,6 +50,22 @@ export class Extension {
         return this._metadata.modules;
     }
 
+    get branch() {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return Travis.branch || this._metadata.repository.branch;
+    }
+
+    get commit() {
+        if(!this._fetched) {
+            throw new Error('Extension manifest hasn\'t been fetched yet');
+        }
+
+        return this._metadata.repository.commit;
+    }
+
     get version() {
         if(!this._fetched) {
             throw new Error('Extension manifest hasn\'t been fetched yet');
@@ -88,30 +105,14 @@ export class Extension {
         return this._dirty[environment] || this._metadata.repository.dirty || false;
     }
 
-    getBranch() {
-        if(!this._fetched) {
-            throw new Error('Extension manifest hasn\'t been fetched yet');
-        }
-
-        return this._metadata.repository.branch;
-    }
-
-    getCommit() {
-        if(!this._fetched) {
-            throw new Error('Extension manifest hasn\'t been fetched yet');
-        }
-
-        return this._metadata.repository.commit;
-    }
-
     getCommitShort() {
-        let commit = this.getCommit();
+        let commit = this.commit;
 
         if(IsNil(commit)) {
             return null;
         }
 
-        return this.getCommit().substring(0, 7);
+        return commit.substring(0, 7);
     }
 
     getVersion(environment, options) {
@@ -144,7 +145,7 @@ export class Extension {
         // Ahead / Behind
         if(this.isAhead(environment)) {
             // Append branch (with special characters replaced with "-")
-            version += '-' + this.getBranch().replace(/[^A-Za-z0-9]+/g, '-');
+            version += '-' + this.branch.replace(/[^A-Za-z0-9]+/g, '-');
 
             // Append commit sha (if defined)
             let commit = this.getCommitShort();
