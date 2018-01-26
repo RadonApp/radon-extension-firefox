@@ -57,7 +57,7 @@ export function buildDescriptor(environment) {
                 {"name": "branch", "type": "string", "values": [Extension.branch]},
                 {"name": "commit", "type": "string", "values": [Extension.commit]},
 
-                {"name": "build_number", "type": "number", "values": [Travis.build_number]}
+                {"name": "build_number", "type": "number", "values": [parseInt(Travis.build_number, 10)]}
             ],
         },
 
