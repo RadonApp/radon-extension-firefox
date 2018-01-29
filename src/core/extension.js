@@ -144,8 +144,16 @@ export class Extension {
 
         // Ahead / Behind
         if(this.isAhead(environment)) {
-            // Append branch (with special characters replaced with "-")
-            version += '-' + this.branch.replace(/[^A-Za-z0-9]+/g, '-');
+            if(this.branch === 'master') {
+                version += '-pre';
+            } else {
+                version += '-dev';
+
+                // Append branch name (for unknown branches)
+                if(this.branch !== 'develop') {
+                    version += '-' + this.branch.replace(/[^A-Za-z0-9]+/g, '-');
+                }
+            }
 
             // Append commit sha (if defined)
             let commit = this.getCommitShort();
