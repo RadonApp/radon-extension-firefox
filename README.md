@@ -1,5 +1,5 @@
 # Neon Extension for Firefox
-[![](https://img.shields.io/travis/NeApp/neon-extension-firefox.svg)](https://travis-ci.org/NeApp/neon-extension-firefox) ![](https://img.shields.io/github/license/NeApp/neon-extension-firefox.svg)
+[![](https://img.shields.io/travis/NeApp/neon-extension-firefox.svg)](https://travis-ci.org/NeApp/neon-extension-firefox) [![](https://img.shields.io/github/release/NeApp/neon-extension-firefox.svg?label=stable)](https://github.com/NeApp/neon-extension-firefox/releases) [![](https://img.shields.io/bintray/v/neapp/neon-extension/neon-extension-firefox.svg?label=latest)](https://bintray.com/neapp/neon-extension/neon-extension-firefox) ![](https://img.shields.io/github/license/NeApp/neon-extension-firefox.svg)
 
 > *Google Music Scrobbler* is now part of the [*Neon*](https://github.com/NeApp) project.
 > 
