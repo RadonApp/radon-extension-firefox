@@ -57,6 +57,8 @@
     "neon-extension-browser-firefox": "1.6.0",
     "neon-extension-browser-webextension": "1.6.0",
     "neon-extension-destination-lastfm": "1.6.0",
+    "neon-extension-destination-librefm": "1.6.0",
+    "neon-extension-destination-listenbrainz": "1.6.0",
     "neon-extension-source-googlemusic": "1.6.0"
   },
   "devDependencies": {
