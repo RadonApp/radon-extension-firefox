@@ -13,6 +13,7 @@ import SortBy from 'lodash-es/sortBy';
 import Constants from './constants';
 import Extension from './extension';
 import Git from './git';
+import {readJson} from './json';
 
 
 export class Registry {
@@ -353,16 +354,24 @@ export class Registry {
     _getMetadata(path) {
         return this._getManifest(path, { required: false })
             // Retrieve package details
-            .then((manifest) => this._getPackageDetails(path).then((data) => ({
+            .then((manifest) => this._getPackageDetails(path).then((details) => ({
                 ...manifest,
 
-                name: data.name,
+                name: details.name,
                 title: manifest.title,
-                version: data.version,
+                version: details.version,
 
                 manifest: manifest,
-                package: data
+                package: details
             })))
+            // Retrieve module contributors
+            .then((metadata) => readJson(Path.join(path, 'contributors.json')).then((contributors) => ({
+                ...metadata,
+
+                contributors
+            }, (err) =>
+                Promise.reject(new Error('Unable to read module contributors: ' + err))
+            )))
             // Try retrieve extension version from git (or fallback to manifest version)
             .then((metadata) => this._getRepositoryDetails(path, metadata.version).then((repository) => {
                 return {
