@@ -11,7 +11,7 @@ import Registry from '../core/registry';
 import {getOutputDirectory, getTaskName} from '../core/helpers';
 
 
-const Pattern = '**/*.{html,js,png,svg}';
+const Pattern = '**/*.{css,eot,html,js,png,svg,ttf,woff}';
 
 export function build(environment) {
     environment = environment || 'production';
