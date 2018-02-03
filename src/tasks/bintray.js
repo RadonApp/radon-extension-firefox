@@ -1,10 +1,10 @@
-import Filesystem from 'fs';
 import Gulp from 'gulp';
 import Path from 'path';
 
 import Extension from '../core/extension';
 import Travis from '../core/travis';
 import {getOutputDirectory, getTaskName} from '../core/helpers';
+import {writeJson} from '../core/json';
 
 
 export function createTask(environment) {
@@ -28,9 +28,11 @@ export function createTasks(environments) {
 export function build(environment) {
     environment = environment || 'production';
 
+    let descriptorPath = Path.join(getOutputDirectory(environment), 'bintray.json');
+
     // Build descriptor
     return buildDescriptor(environment)
-        .then((descriptor) => writeDescriptor(environment, descriptor));
+        .then((descriptor) => writeJson(descriptorPath, descriptor));
 }
 
 export function buildDescriptor(environment) {
@@ -66,31 +68,6 @@ export function buildDescriptor(environment) {
         ],
 
         'publish': true
-    });
-}
-
-export function writeDescriptor(environment, descriptor) {
-    let destinationPath = Path.join(getOutputDirectory(environment), 'bintray.json');
-
-    // Encode manifest
-    let data;
-
-    try {
-        data = JSON.stringify(descriptor, null, 2);
-    } catch(e) {
-        return Promise.reject(e);
-    }
-
-    // Write manifest to output directory
-    return new Promise((resolve, reject) => {
-        Filesystem.writeFile(destinationPath, data, (err) => {
-            if(err) {
-                reject(err);
-                return;
-            }
-
-            resolve(destinationPath);
-        });
     });
 }
 

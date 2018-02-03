@@ -3,7 +3,6 @@ import Filesystem from 'fs';
 import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
 import IsNil from 'lodash-es/isNil';
-import Mkdirp from 'mkdirp';
 import Path from 'path';
 import Pick from 'lodash-es/pick';
 import Reduce from 'lodash-es/reduce';
@@ -14,15 +13,18 @@ import Browser from '../core/browser';
 import Extension from '../core/extension';
 import Registry from '../core/registry';
 import {getOutputDirectory, getTaskName} from '../core/helpers';
+import {writeJson} from '../core/json';
 
 
 export function build(environment) {
     environment = environment || 'production';
 
+    let manifestPath = Path.join(getOutputDirectory(environment, 'unpacked'), 'manifest.json');
+
     // Build manifest from modules
     return buildModuleManifests(environment)
         .then((manifests) => buildManifest(environment, manifests))
-        .then((manifest) => writeManifest(environment, manifest));
+        .then((manifest) => writeJson(manifestPath, manifest));
 }
 
 export function createTask(environment) {
@@ -213,35 +215,6 @@ function buildModulePermissions(environment, module) {
         permissions,
         optional_permissions
     };
-}
-
-function writeManifest(environment, manifest) {
-    let outputPath = getOutputDirectory(environment, 'unpacked');
-    let destinationPath = Path.join(outputPath, 'manifest.json');
-
-    // Ensure output directory exists
-    Mkdirp.sync(outputPath);
-
-    // Encode manifest
-    let data;
-
-    try {
-        data = JSON.stringify(manifest, null, 2);
-    } catch(e) {
-        return Promise.reject(e);
-    }
-
-    // Write manifest to output directory
-    return new Promise((resolve, reject) => {
-        Filesystem.writeFile(destinationPath, data, (err) => {
-            if(err) {
-                reject(err);
-                return;
-            }
-
-            resolve(destinationPath);
-        });
-    });
 }
 
 export function createContentScript(contentScript) {
