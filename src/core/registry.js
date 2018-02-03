@@ -369,9 +369,9 @@ export class Registry {
                 ...metadata,
 
                 contributors
-            }, (err) =>
+            }), (err) =>
                 Promise.reject(new Error('Unable to read module contributors: ' + err))
-            )))
+            ))
             // Try retrieve extension version from git (or fallback to manifest version)
             .then((metadata) => this._getRepositoryDetails(path, metadata.version).then((repository) => {
                 return {
