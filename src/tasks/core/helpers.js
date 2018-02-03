@@ -1,5 +1,6 @@
 import Filesystem from 'fs';
 import Glob from 'glob';
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
 import Yazl from 'yazl';
@@ -47,4 +48,12 @@ export function createZip(options) {
             })
         });
     });
+}
+
+export function sortKey(value) {
+    if(IsNil(value)) {
+        return null;
+    }
+
+    return value.replace(/[^a-zA-Z]/g, '').toLowerCase();
 }
