@@ -1,5 +1,7 @@
 import Filesystem from 'fs';
 import IsNil from 'lodash-es/isNil';
+import Mkdirp from 'mkdirp';
+import Path from 'path';
 
 
 export function readJson(path, defaultValue) {
@@ -47,6 +49,9 @@ export function writeJson(path, data) {
     }
 
     return new Promise((resolve, reject) => {
+        // Ensure directory exists
+        Mkdirp.sync(Path.dirname(path));
+
         // Write `body` to file `path`
         Filesystem.writeFile(path, body, (err) => {
             if(err) {
