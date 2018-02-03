@@ -199,7 +199,6 @@ export class Extension {
 
                 'title',
                 'description',
-                'version',
 
                 // Required Permissions
                 'origins',
