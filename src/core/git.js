@@ -2,9 +2,39 @@ import Filesystem from 'fs';
 import IsNil from 'lodash-es/isNil';
 import Path from 'path';
 import SimpleGit from 'simple-git';
+import SortBy from 'lodash-es/sortBy';
 
 
 export class Git {
+    contributors(path) {
+        let repository = SimpleGit(path).silent(true);
+
+        // Retrieve repository commits
+        return this._getCommits(repository).then((commits) => {
+            let contributorsMap = {};
+
+            for(let i = 0; i < commits.all.length; i++) {
+                let commit = commits.all[i];
+
+                if(IsNil(contributorsMap[commit.author_email])) {
+                    // Create contributor
+                    contributorsMap[commit.author_email] = {
+                        name: commit.author_name,
+                        email: commit.author_email,
+
+                        commits: 0
+                    };
+                }
+
+                // Update contributor commit count
+                contributorsMap[commit.author_email].commits += 1;
+            }
+
+            // Sort contributors by commit count
+            return SortBy(Object.values(contributorsMap), 'commits');
+        });
+    }
+
     version(path, packageVersion) {
         return this.status(path).then((status) => {
             // Build version
@@ -86,7 +116,7 @@ export class Git {
             })));
     }
 
-    _getCommits(repository, from, to = 'HEAD') {
+    _getCommits(repository, from = null, to = 'HEAD') {
         return new Promise((resolve, reject) => {
             repository.log({ from, to }, (err, commits) => {
                 if(err) {
