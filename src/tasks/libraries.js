@@ -1,4 +1,4 @@
-import Credits from 'credits';
+import Credits from '@fuzeman/credits';
 import Gulp from 'gulp';
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';

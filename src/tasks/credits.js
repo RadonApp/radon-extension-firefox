@@ -1,5 +1,5 @@
 import CloneDeep from 'lodash-es/cloneDeep';
-import Credits from 'credits';
+import Credits from '@fuzeman/credits';
 import Filter from 'lodash-es/filter';
 import Get from 'lodash-es/get';
 import Gulp from 'gulp';
