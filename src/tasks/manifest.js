@@ -1,5 +1,6 @@
 import CloneDeep from 'lodash-es/cloneDeep';
 import Filesystem from 'fs';
+import Filter from 'lodash-es/filter';
 import ForEach from 'lodash-es/forEach';
 import Gulp from 'gulp';
 import IsNil from 'lodash-es/isNil';
@@ -172,7 +173,7 @@ function buildModuleManifest(environment, module) {
     // Content Scripts (if the browser doesn't support declarative content)
     if(!Browser.supportsApi(environment, 'declarativeContent', 'permissions')) {
         manifest.content_scripts = module.manifest.content_scripts.map((contentScript) =>
-            createContentScript(contentScript)
+            createContentScript(environment, contentScript)
         );
     }
 
@@ -219,14 +220,21 @@ function buildModulePermissions(environment, module) {
     };
 }
 
-export function createContentScript(contentScript) {
+export function createContentScript(environment, contentScript) {
     if(IsNil(contentScript) || IsNil(contentScript.conditions)) {
         throw new Error('Invalid content script definition');
     }
 
+    let outputPath = getOutputDirectory(environment, 'unpacked');
+
     return {
-        css: [],
-        js: [],
+        css: Filter(contentScript.css || [], (path) =>
+            Filesystem.existsSync(Path.join(outputPath, path))
+        ),
+
+        js: Filter(contentScript.js || [], (path) =>
+            Filesystem.existsSync(Path.join(outputPath, path))
+        ),
 
         matches: contentScript.conditions.map((condition) => {
             if(IsNil(condition) || IsNil(condition.pattern)) {
@@ -234,12 +242,7 @@ export function createContentScript(contentScript) {
             }
 
             return condition.pattern;
-        }),
-
-        ...Pick(contentScript, [
-            'css',
-            'js'
-        ])
+        })
     };
 }
 
