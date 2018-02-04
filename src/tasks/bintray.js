@@ -69,7 +69,7 @@ export function buildDescriptor(environment) {
                 "uploadPattern": "$1"
             },
             {
-                "includePattern": "build/production/(MD5SUMS|webpack*)",
+                "includePattern": "build/production/(MD5SUMS|webpack.*)",
                 "uploadPattern": Extension.getVersion(environment) + "/$1"
             }
         ],
