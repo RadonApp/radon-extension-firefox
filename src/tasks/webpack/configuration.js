@@ -467,7 +467,9 @@ function getModuleDetails(environment, path) {
     }
 
     // Find matching module
-    let module = Registry.match(environment, path);
+    let module = Registry.match(environment, path, {
+        type: { exclude: ['package'] }
+    });
 
     // Module
     if(!IsNil(module)) {
