@@ -1,5 +1,6 @@
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import Filesystem from 'fs';
+import GulpUtil from 'gulp-util';
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 import Path from 'path';
@@ -420,6 +421,24 @@ function shouldExtractModule(module, count, options) {
         include = true;
     }
 
+    if(include) {
+        GulpUtil.log(GulpUtil.colors.green(
+            '[' + options.chunk + '] ' + module.userRequest + ' (' +
+                'count: ' + count + ', ' +
+                'type: "' + details.type + '", ' +
+                'shared: ' + isSharedDependency(details.name) +
+            ')'
+        ));
+    } else {
+        GulpUtil.log(GulpUtil.colors.red(
+            '[' + options.chunk + '] ' + module.userRequest + ' (' +
+                'count: ' + count + ', ' +
+                'type: "' + details.type + '", ' +
+                'shared: ' + isSharedDependency(details.name) +
+            ')'
+        ));
+    }
+
     // Ignore excluded/invalid modules
     if(IsNil(module.userRequest) || !include) {
         return include;
@@ -519,7 +538,7 @@ function getModuleName(basePath, path) {
 }
 
 function isSharedDependency(name) {
-    if(name.startsWith('neon-extension-')) {
+    if(IsNil(name) || name.startsWith('neon-extension-')) {
         return false;
     }
 
