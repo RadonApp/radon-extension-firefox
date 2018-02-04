@@ -5,9 +5,7 @@ import {getTaskName} from '../core/helpers';
 
 
 export function createTask(environment) {
-    Gulp.task(getTaskName(environment, 'discover'), [
-        getTaskName(environment, 'clean')
-    ], (done) => {
+    Gulp.task(getTaskName(environment, 'discover'), (done) => {
         // Discover modules
         Registry.discover(environment).then(() => {
             done();

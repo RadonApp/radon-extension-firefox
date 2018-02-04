@@ -8,7 +8,9 @@ import Registry from '../../core/registry';
 
 
 export function createChunks(environment) {
-    let modules = Registry.list(environment);
+    let modules = Registry.list(environment, {
+        filter: (module) => module.type !== 'package'
+    });
 
     // Retrieve destinations
     let destinations = Registry.list(environment, {

@@ -37,6 +37,26 @@ export function readJson(path, defaultValue) {
     });
 }
 
+export function readJsonSync(path, defaultValue) {
+    let body;
+
+    try {
+        // Read `body` from file `path`
+        body = Filesystem.readFileSync(path);
+    } catch(e) {
+        // Return the `defaultValue` if the file doesn't exist
+        if(e.code === 'ENOENT' && !IsNil(defaultValue)) {
+            return defaultValue;
+        }
+
+        // Re-throw error
+        throw e;
+    }
+
+    // Decode JSON `body`
+    return JSON.parse(body);
+}
+
 export function writeJson(path, data) {
     let body;
 

@@ -23,9 +23,7 @@ export function build(environment) {
     Mkdirp.sync(outputPath);
 
     // Copy assets to output directory
-    return copyModules(environment, outputPath).then(() =>
-        copyPackageAssets(outputPath)
-    );
+    return copyModules(environment, outputPath);
 }
 
 export function createTask(environment) {
@@ -44,29 +42,6 @@ export function createTasks(environments) {
     environments.forEach((environment) =>
         createTask(environment)
     );
-}
-
-function copyPackageAssets(outputPath) {
-    let sourcePath = Path.join(Constants.PackagePath, 'assets');
-
-    // Ensure source path exists
-    if(!Filesystem.existsSync(sourcePath)) {
-        return false;
-    }
-
-    // Copy assets to build directory
-    return copy(sourcePath, outputPath).then((files) => {
-        GulpUtil.log(
-            GulpUtil.colors.green('Copied %d asset(s)'),
-            files.length
-        );
-    }, (err) => {
-        GulpUtil.log(
-            GulpUtil.colors.red('Unable to copy assets: %s'),
-            err.message
-        );
-        return Promise.reject(err);
-    });
 }
 
 function copyModules(environment, outputPath) {

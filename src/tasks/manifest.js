@@ -47,7 +47,9 @@ export function createTasks(environments) {
 }
 
 function buildModuleManifests(environment) {
-    return Promise.all(Registry.list(environment).map((module) => {
+    return Promise.all(Registry.list(environment, {
+        filter: (module) => module.type !== 'package'
+    }).map((module) => {
         return buildModuleManifest(environment, module);
     }));
 }
