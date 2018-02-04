@@ -64,7 +64,14 @@ export function buildDescriptor(environment) {
         },
 
         'files': [
-            {"includePattern": "build/production/(.*\\.zip)", "uploadPattern": "$1"}
+            {
+                "includePattern": "build/production/(.*\\.zip)",
+                "uploadPattern": "$1"
+            },
+            {
+                "includePattern": "build/production/(MD5SUMS|webpack*)",
+                "uploadPattern": Extension.getVersion(environment) + "/$1"
+            }
         ],
 
         'publish': true
