@@ -23,7 +23,7 @@
     "url": "https://github.com/NeApp/neon-extension-firefox"
   },
   "scripts": {
-    "build": "neb build --browser firefox",
+    "build": "neb build --browser firefox --environment production",
     "test": "echo No tests available yet."
   },
   "dependencies": {
