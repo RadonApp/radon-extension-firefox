@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-firefox",
-  "version": "1.7.0-beta.4",
+  "version": "1.7.0-beta.5",
   "description": "Neon Extension for Firefox (formerly Google Music Scrobbler)",
   "keywords": [
     "neon",
@@ -30,7 +30,7 @@
     "neon-extension-browser-base": "1.7.0-beta.1",
     "neon-extension-browser-firefox": "1.7.0-beta.1",
     "neon-extension-browser-webextension": "1.7.0-beta.1",
-    "neon-extension-build": "1.7.0-beta.4",
+    "neon-extension-build": "1.7.0-beta.5",
     "neon-extension-core": "1.7.0-beta.4",
     "neon-extension-destination-lastfm": "1.7.0-beta.1",
     "neon-extension-destination-librefm": "1.7.0-beta.1",
