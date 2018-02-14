@@ -7,7 +7,7 @@ before_install:
 install:
 - neb install:travis $TRAVIS_BRANCH
 - npm install
-- npm ls
+- npm ls || true
 script:
 - git reset --hard
 - npm run test
