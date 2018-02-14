@@ -3,7 +3,11 @@ node_js:
 - '7'
 before_install:
 - npm install -g npm@'>=5.5.1'
-- tools/install_modules.py $TRAVIS_BRANCH
+- npm install NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install NeApp/neon-extension-build#develop
+install:
+- neb install:travis $TRAVIS_BRANCH
+- npm install
+- npm ls
 script:
 - git reset --hard
 - npm run test
