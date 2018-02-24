@@ -36,7 +36,8 @@
     "neon-extension-destination-librefm": "1.7.2",
     "neon-extension-destination-listenbrainz": "1.7.2",
     "neon-extension-framework": "1.7.2",
-    "neon-extension-source-googlemusic": "1.7.2"
+    "neon-extension-source-googlemusic": "1.7.2",
+    "neon-extension-source-spotify": "1.7.2"
   },
   "devDependencies": {
     "@babel/core": "7.0.0-beta.32",

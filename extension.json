@@ -46,7 +46,8 @@
       "neon-extension-destination-listenbrainz"
     ],
     "sources": [
-      "neon-extension-source-googlemusic"
+      "neon-extension-source-googlemusic",
+      "neon-extension-source-spotify"
     ]
   }
 }
