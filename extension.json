@@ -36,10 +36,6 @@
   },
 
   "modules": {
-    "browsers": [
-      "neon-extension-browser-webextension",
-      "neon-extension-browser-firefox"
-    ],
     "destinations": [
       "neon-extension-destination-lastfm",
       "neon-extension-destination-librefm",

@@ -27,9 +27,6 @@
     "test": "echo No tests available yet."
   },
   "dependencies": {
-    "neon-extension-browser-base": "1.7.2",
-    "neon-extension-browser-firefox": "1.7.2",
-    "neon-extension-browser-webextension": "1.7.2",
     "neon-extension-build": "1.7.2",
     "neon-extension-core": "1.7.2",
     "neon-extension-destination-lastfm": "1.7.2",
@@ -76,6 +73,7 @@
     "urijs": "1.18.2",
     "uuid": "2.0.3",
     "warning": "2.1.0",
+    "wes": "1.0.0-beta.1",
     "whatwg-fetch": "2.0.3"
   }
 }
