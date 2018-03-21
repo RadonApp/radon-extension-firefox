@@ -21,8 +21,8 @@
       "background/common.js",
 
       "background/messaging/messaging.js",
+      "background/messaging/services/contentScript.js",
       "background/messaging/services/library.js",
-      "background/messaging/services/storage.js",
       "background/messaging/services/scrobble.js",
 
       "background/main/main.js",
