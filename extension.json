@@ -8,9 +8,13 @@
       "strict_min_version": "57.0a1"
     }
   },
-  "permissions": [
+
+  "origins": [
     "*://play.google.com/music/*",
-    "*://ws.audioscrobbler.com/2.0/*",
+    "*://ws.audioscrobbler.com/2.0/*"
+  ],
+
+  "permissions": [
     "storage",
     "unlimitedStorage"
   ],
