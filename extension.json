@@ -35,6 +35,10 @@
     "open_in_tab": true
   },
 
+  "features": {
+    "contentScripts": "dynamic",
+    "permissions": "dynamic"
+  },
   "modules": {
     "destinations": [
       "neon-extension-destination-lastfm",
