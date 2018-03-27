@@ -14,15 +14,16 @@ script:
 - npm run build
 deploy:
 - provider: releases
+  skip_cleanup: true
   api_key:
     secure: AKZefc+oQWOuXAK7ytS2tFgEmenpGP8gHijYA8BZNqA4HhwWWYYFWAHaGVrVGgEcnHAJBAqee/smw2przpka12IqccyfhvSng0uhPU7HvWdqO/VDW38d+JmneExiCvn1Nw7N+xwoX65FRn/jDlsooUeAqk0rn5Gj6CBbzk6yf7o=
-  skip_cleanup: true
   file_glob: true
   file: build/production/Neon*.zip
   on:
     repo: NeApp/neon-extension-firefox
     tags: true
 - provider: bintray
+  skip_cleanup: true
   key:
     secure: VPZRZxfyFKRPTN70BSmud8du98gLe2k17yaMmHu31MbEsjbfVWLELmjL2367hLhNmUpgS5nP12kQAYLAaWkR65rUrDlxPTaHIO6wYTfXfC3auSSnGc0wBOmEBhRg/xIkXhbkLszbCADpsAnVHPdzPhSLC0MkLI4dNZKPJnqHqW8=
   file: build/production/bintray.json
