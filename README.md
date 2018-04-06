@@ -30,6 +30,7 @@ Issues can be reported in the [neon-extension](https://github.com/NeApp/neon-ext
 | [neon-extension-destination-listenbrainz](https://github.com/NeApp/neon-extension-destination-listenbrainz) | [![](https://img.shields.io/travis/NeApp/neon-extension-destination-listenbrainz.svg)](https://travis-ci.org/NeApp/neon-extension-destination-listenbrainz) |  |
 | **Sources**                                                                                                 |                                                                                                                                                             |  |
 | [neon-extension-source-googlemusic](https://github.com/NeApp/neon-extension-source-googlemusic)             | [![](https://img.shields.io/travis/NeApp/neon-extension-source-googlemusic.svg)](https://travis-ci.org/NeApp/neon-extension-source-googlemusic)             |  |
+| [neon-extension-source-spotify](https://github.com/NeApp/neon-extension-source-spotify)                     | [![](https://img.shields.io/travis/NeApp/neon-extension-source-spotify.svg)](https://travis-ci.org/NeApp/neon-extension-source-spotify)                     |  |
 
 ## Build
 
