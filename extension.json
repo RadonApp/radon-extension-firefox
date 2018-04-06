@@ -1,6 +1,6 @@
 {
   "title": "Neon",
-  "description": "Scrobble your Google Play Music listening activity to Last.fm, Libre.fm and ListenBrainz",
+  "description": "Scrobble your Google Play Music and Spotify listening activity to Last.fm, Libre.fm and ListenBrainz",
 
   "applications": {
     "gecko": {
