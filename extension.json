@@ -34,7 +34,7 @@
     ]
   },
   "options_ui": {
-    "page": "configuration/configuration.html",
+    "page": "application.html#/configuration",
     "browser_style": false,
     "open_in_tab": true
   },
