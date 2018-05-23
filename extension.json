@@ -21,20 +21,20 @@
 
   "background": {
     "scripts": [
-      "common.js",
-      "background/common.js",
+      "Common.js",
+      "Background/Common.js",
+      "Background/Messaging.js",
 
-      "background/messaging/messaging.js",
-      "background/messaging/services/contentScript.js",
-      "background/messaging/services/library.js",
-      "background/messaging/services/scrobble.js",
+      "Background/Services/ContentScript.js",
+      "Background/Services/Library.js",
+      "Background/Services/Scrobble.js",
 
-      "background/main/main.js",
-      "background/migrate/migrate.js"
+      "Background/Services/App.js",
+      "Background/Services/Migrate.js"
     ]
   },
   "options_ui": {
-    "page": "application.html#/configuration",
+    "page": "Application.html#/configuration",
     "browser_style": false,
     "open_in_tab": true
   },
