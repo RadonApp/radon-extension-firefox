@@ -28,8 +28,11 @@
     "neon-extension-destination-lastfm": "1.9.0",
     "neon-extension-destination-librefm": "1.9.0",
     "neon-extension-destination-listenbrainz": "1.9.0",
+    "neon-extension-destination-trakt": "1.9.0",
     "neon-extension-framework": "1.9.0",
+    "neon-extension-source-amazonvideo": "1.9.0",
     "neon-extension-source-googlemusic": "1.9.0",
+    "neon-extension-source-netflix": "1.9.0",
     "neon-extension-source-spotify": "1.9.0"
   },
   "devDependencies": {
