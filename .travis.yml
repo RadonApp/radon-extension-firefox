@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - '7'
 before_install:
-- npm install -g npm@'>=5.5.1'
+- npm install -g npm@'^5.10.0'
 - npm install NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install NeApp/neon-extension-build#develop
 install:
 - neb install:travis $TRAVIS_BRANCH
