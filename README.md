@@ -71,4 +71,4 @@ Issues can be reported in the [neon-extension](https://github.com/NeApp/neon-ext
     npm run build
     ```
 
-    Build artifacts will be available at `build/production/`
+    Build artifacts will be available at `Build/Production/`
