@@ -3,23 +3,27 @@ node_js:
 - '7'
 before_install:
 - npm install -g npm@'^5.10.0'
-- npm install NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install NeApp/neon-extension-build#develop
+- npm install -g NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install -g NeApp/neon-extension-build#develop
 install:
-- neb install:travis $TRAVIS_BRANCH
-- npm install
-- npm dedupe
-- npm ls
+- neb travis:install $TRAVIS_BRANCH
+- neb package:validate
+- git diff --exit-code
 script:
-- git reset --hard
-- npm run test
 - npm run build
+- npm run travis:test
+- npm run travis:coverage
+- npm run travis:lint
+- if [ ! -f ./Build/Coverage/lcov.info ]; then exit 1; fi
+after_success:
+- npm install -g coveralls
+- cat ./Build/Coverage/lcov.info | coveralls
 deploy:
 - provider: releases
   skip_cleanup: true
   api_key:
     secure: AKZefc+oQWOuXAK7ytS2tFgEmenpGP8gHijYA8BZNqA4HhwWWYYFWAHaGVrVGgEcnHAJBAqee/smw2przpka12IqccyfhvSng0uhPU7HvWdqO/VDW38d+JmneExiCvn1Nw7N+xwoX65FRn/jDlsooUeAqk0rn5Gj6CBbzk6yf7o=
   file_glob: true
-  file: build/production/Neon*.zip
+  file: Build/Production/Neon*.zip
   on:
     repo: NeApp/neon-extension-firefox
     tags: true
@@ -27,7 +31,7 @@ deploy:
   skip_cleanup: true
   key:
     secure: VPZRZxfyFKRPTN70BSmud8du98gLe2k17yaMmHu31MbEsjbfVWLELmjL2367hLhNmUpgS5nP12kQAYLAaWkR65rUrDlxPTaHIO6wYTfXfC3auSSnGc0wBOmEBhRg/xIkXhbkLszbCADpsAnVHPdzPhSLC0MkLI4dNZKPJnqHqW8=
-  file: build/production/bintray.json
+  file: Build/Production/bintray.json
   user: neapp-ci
   on:
     repo: NeApp/neon-extension-firefox

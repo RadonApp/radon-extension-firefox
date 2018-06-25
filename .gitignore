@@ -1,10 +1,12 @@
 /.babel
-/build
+/.modules
+/.phantomjs
+/Build
 /node_modules
-/releases
 
-/gulpfile.tmp*
-/package-lock.json
+/npm-debug.log*
 /TAG_MESSAGE
 
 *.iml
+*.log
+*.tgz
