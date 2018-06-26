@@ -25,6 +25,7 @@
       "Background/Common.js",
       "Background/Messaging.js",
 
+      "Background/Services/Callback.js",
       "Background/Services/ContentScript.js",
       "Background/Services/Library.js",
       "Background/Services/Scrobble.js",
