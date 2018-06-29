@@ -23,7 +23,7 @@ deploy:
   api_key:
     secure: AKZefc+oQWOuXAK7ytS2tFgEmenpGP8gHijYA8BZNqA4HhwWWYYFWAHaGVrVGgEcnHAJBAqee/smw2przpka12IqccyfhvSng0uhPU7HvWdqO/VDW38d+JmneExiCvn1Nw7N+xwoX65FRn/jDlsooUeAqk0rn5Gj6CBbzk6yf7o=
   file_glob: true
-  file: Build/Production/Neon*.zip
+  file: Build/Production/Radon*.zip
   on:
     repo: NeApp/neon-extension-firefox
     tags: true

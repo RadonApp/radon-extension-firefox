@@ -1,9 +1,9 @@
-# Neon Extension for Firefox
+# Radon Extension for Firefox
 [![](https://img.shields.io/travis/NeApp/neon-extension-firefox.svg)](https://travis-ci.org/NeApp/neon-extension-firefox) [![](https://img.shields.io/coveralls/github/NeApp/neon-extension-firefox/master.svg)](https://coveralls.io/github/NeApp/neon-extension-firefox) [![](https://img.shields.io/github/release/NeApp/neon-extension-firefox.svg?label=stable)](https://github.com/NeApp/neon-extension-firefox/releases) [![](https://img.shields.io/bintray/v/neapp/neon-extension/neon-extension-firefox.svg?label=latest)](https://bintray.com/neapp/neon-extension/neon-extension-firefox) ![](https://img.shields.io/github/license/NeApp/neon-extension-firefox.svg)
 
-> *Google Music Scrobbler* is now part of the [*Neon*](https://github.com/NeApp) project.
+> *Google Music Scrobbler* is now part of the [*Radon*](https://github.com/NeApp) project.
 >
-> [*Neon*](https://github.com/NeApp) is a complete rewrite of *Google Music Scrobbler* with support for Firefox 57+, and has been designed to support many more sources and destinations in the future.
+> [*Radon*](https://github.com/NeApp) is a complete rewrite of *Google Music Scrobbler* with support for Firefox 57+, and has been designed to support many more sources and destinations in the future.
 >
 > **Note:** The extension is currently still listed on [addons.mozilla.org](https://addons.mozilla.org) as [*Google Music Scrobbler*](https://addons.mozilla.org/en-US/firefox/addon/google-music-scrobbler/), this will be updated once a stable release is ready.
 
