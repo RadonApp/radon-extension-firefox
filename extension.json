@@ -1,6 +1,6 @@
 {
   "title": "Radon",
-  "description": "Scrobble your Google Play Music and Spotify listening activity to Last.fm, Libre.fm and ListenBrainz",
+  "description": "Track and share your listening and watching activity with Last.fm, Libre.fm, ListenBrainz and Trakt.tv",
 
   "applications": {
     "gecko": {
