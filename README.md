@@ -4,6 +4,8 @@
 > *Google Music Scrobbler* is now part of the [*Radon*](https://github.com/NeApp) project.
 >
 > [*Radon*](https://github.com/NeApp) is a complete rewrite of *Google Music Scrobbler* with support for Firefox 57+, and has been designed to support many more sources and destinations in the future.
+>
+> Extension is currently being renamed to *Radon*, there will likely still be some references to *Neon* until this has been completed.
 
 ### Issues
 
