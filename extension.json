@@ -46,17 +46,17 @@
   },
   "modules": {
     "destinations": [
-      "neon-extension-destination-lastfm",
-      "neon-extension-destination-librefm",
-      "neon-extension-destination-listenbrainz",
-      "neon-extension-destination-trakt"
+      "lastfm",
+      "librefm",
+      "listenbrainz",
+      "trakt"
     ],
     "sources": [
-      "neon-extension-source-amazonvideo",
-      "neon-extension-source-googlemusic",
-      "neon-extension-source-netflix",
-      "neon-extension-source-spotify",
-      "neon-extension-source-youtubemusic"
+      "amazonvideo",
+      "googlemusic",
+      "netflix",
+      "spotify",
+      "youtubemusic"
     ]
   }
 }

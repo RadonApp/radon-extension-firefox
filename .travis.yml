@@ -3,7 +3,7 @@ node_js:
 - '7'
 before_install:
 - npm install -g npm@'^5.10.0'
-- npm install -g NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install -g NeApp/neon-extension-build#develop
+- npm install -g RadonApp/radon-extension-build#$TRAVIS_BRANCH || npm install -g RadonApp/radon-extension-build#develop
 install:
 - neb travis:install $TRAVIS_BRANCH
 - neb package:validate
@@ -25,7 +25,7 @@ deploy:
   file_glob: true
   file: Build/Production/Radon*.zip
   on:
-    repo: NeApp/neon-extension-firefox
+    repo: RadonApp/radon-extension-firefox
     tags: true
 - provider: bintray
   skip_cleanup: true
@@ -34,5 +34,5 @@ deploy:
   file: Build/Production/bintray.json
   user: neapp-ci
   on:
-    repo: NeApp/neon-extension-firefox
+    repo: RadonApp/radon-extension-firefox
     all_branches: true

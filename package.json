@@ -1,40 +1,40 @@
 {
-  "name": "neon-extension-firefox",
+  "name": "@radon-extension/firefox",
   "version": "2.1.0",
   "description": "Radon Extension for Firefox",
   "keywords": [
-    "neon",
-    "neon-extension",
+    "radon",
+    "radon-extension",
     "firefox"
   ],
-  "homepage": "https://github.com/NeApp/neon-extension",
+  "homepage": "https://github.com/RadonApp/radon-extension",
   "author": "Dean Gardiner <me@dgardiner.net>",
   "license": "GPL-3.0",
   "main": "./src",
   "private": true,
   "bugs": {
-    "url": "https://github.com/NeApp/neon-extension/issues"
+    "url": "https://github.com/RadonApp/radon-extension/issues"
   },
   "engines": {
     "npm": ">=5.5.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NeApp/neon-extension-firefox"
+    "url": "https://github.com/RadonApp/radon-extension-firefox"
   },
   "dependencies": {
-    "neon-extension-build": "file:neon-extension-build-2.1.0.tgz",
-    "neon-extension-core": "file:neon-extension-core-2.1.0.tgz",
-    "neon-extension-destination-lastfm": "file:neon-extension-destination-lastfm-2.1.0.tgz",
-    "neon-extension-destination-librefm": "file:neon-extension-destination-librefm-2.1.0.tgz",
-    "neon-extension-destination-listenbrainz": "file:neon-extension-destination-listenbrainz-2.1.0.tgz",
-    "neon-extension-destination-trakt": "file:neon-extension-destination-trakt-2.1.0.tgz",
-    "neon-extension-framework": "file:neon-extension-framework-2.1.0.tgz",
-    "neon-extension-source-amazonvideo": "file:neon-extension-source-amazonvideo-2.1.0.tgz",
-    "neon-extension-source-googlemusic": "file:neon-extension-source-googlemusic-2.1.0.tgz",
-    "neon-extension-source-netflix": "file:neon-extension-source-netflix-2.1.0.tgz",
-    "neon-extension-source-spotify": "file:neon-extension-source-spotify-2.1.0.tgz",
-    "neon-extension-source-youtubemusic": "file:neon-extension-source-youtubemusic-2.1.0.tgz"
+    "@radon-extension/build": "file:radon-extension-build-2.1.0.tgz",
+    "@radon-extension/core": "file:radon-extension-core-2.1.0.tgz",
+    "@radon-extension/plugin-lastfm": "file:radon-extension-plugin-lastfm-2.1.0.tgz",
+    "@radon-extension/plugin-librefm": "file:radon-extension-plugin-librefm-2.1.0.tgz",
+    "@radon-extension/plugin-listenbrainz": "file:radon-extension-plugin-listenbrainz-2.1.0.tgz",
+    "@radon-extension/plugin-trakt": "file:radon-extension-plugin-trakt-2.1.0.tgz",
+    "@radon-extension/framework": "file:radon-extension-framework-2.1.0.tgz",
+    "@radon-extension/plugin-amazonvideo": "file:radon-extension-plugin-amazonvideo-2.1.0.tgz",
+    "@radon-extension/plugin-googlemusic": "file:radon-extension-plugin-googlemusic-2.1.0.tgz",
+    "@radon-extension/plugin-netflix": "file:radon-extension-plugin-netflix-2.1.0.tgz",
+    "@radon-extension/plugin-spotify": "file:radon-extension-plugin-spotify-2.1.0.tgz",
+    "@radon-extension/plugin-youtubemusic": "file:radon-extension-plugin-youtubemusic-2.1.0.tgz"
   },
   "devDependencies": {
     "react": "^15.6.2"
