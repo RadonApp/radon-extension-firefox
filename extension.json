@@ -55,7 +55,8 @@
       "neon-extension-source-amazonvideo",
       "neon-extension-source-googlemusic",
       "neon-extension-source-netflix",
-      "neon-extension-source-spotify"
+      "neon-extension-source-spotify",
+      "neon-extension-source-youtubemusic"
     ]
   }
 }

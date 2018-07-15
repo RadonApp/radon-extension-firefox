@@ -33,7 +33,8 @@
     "neon-extension-source-amazonvideo": "file:neon-extension-source-amazonvideo-2.0.2.tgz",
     "neon-extension-source-googlemusic": "file:neon-extension-source-googlemusic-2.0.1.tgz",
     "neon-extension-source-netflix": "file:neon-extension-source-netflix-2.0.1.tgz",
-    "neon-extension-source-spotify": "file:neon-extension-source-spotify-2.0.1.tgz"
+    "neon-extension-source-spotify": "file:neon-extension-source-spotify-2.0.1.tgz",
+    "neon-extension-source-youtubemusic": "file:neon-extension-source-youtubemusic-2.0.1.tgz"
   },
   "devDependencies": {
     "react": "^15.6.2"
