@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-firefox",
-  "version": "2.1.0-beta.5",
+  "version": "2.1.0",
   "description": "Radon Extension for Firefox",
   "keywords": [
     "neon",
@@ -23,18 +23,18 @@
     "url": "https://github.com/NeApp/neon-extension-firefox"
   },
   "dependencies": {
-    "neon-extension-build": "file:neon-extension-build-2.1.0-beta.5.tgz",
-    "neon-extension-core": "file:neon-extension-core-2.1.0-beta.3.tgz",
-    "neon-extension-destination-lastfm": "file:neon-extension-destination-lastfm-2.1.0-beta.1.tgz",
-    "neon-extension-destination-librefm": "file:neon-extension-destination-librefm-2.1.0-beta.1.tgz",
-    "neon-extension-destination-listenbrainz": "file:neon-extension-destination-listenbrainz-2.1.0-beta.1.tgz",
-    "neon-extension-destination-trakt": "file:neon-extension-destination-trakt-2.1.0-beta.5.tgz",
-    "neon-extension-framework": "file:neon-extension-framework-2.1.0-beta.5.tgz",
-    "neon-extension-source-amazonvideo": "file:neon-extension-source-amazonvideo-2.1.0-beta.5.tgz",
-    "neon-extension-source-googlemusic": "file:neon-extension-source-googlemusic-2.1.0-beta.1.tgz",
-    "neon-extension-source-netflix": "file:neon-extension-source-netflix-2.1.0-beta.1.tgz",
-    "neon-extension-source-spotify": "file:neon-extension-source-spotify-2.1.0-beta.1.tgz",
-    "neon-extension-source-youtubemusic": "file:neon-extension-source-youtubemusic-2.1.0-beta.4.tgz"
+    "neon-extension-build": "file:neon-extension-build-2.1.0.tgz",
+    "neon-extension-core": "file:neon-extension-core-2.1.0.tgz",
+    "neon-extension-destination-lastfm": "file:neon-extension-destination-lastfm-2.1.0.tgz",
+    "neon-extension-destination-librefm": "file:neon-extension-destination-librefm-2.1.0.tgz",
+    "neon-extension-destination-listenbrainz": "file:neon-extension-destination-listenbrainz-2.1.0.tgz",
+    "neon-extension-destination-trakt": "file:neon-extension-destination-trakt-2.1.0.tgz",
+    "neon-extension-framework": "file:neon-extension-framework-2.1.0.tgz",
+    "neon-extension-source-amazonvideo": "file:neon-extension-source-amazonvideo-2.1.0.tgz",
+    "neon-extension-source-googlemusic": "file:neon-extension-source-googlemusic-2.1.0.tgz",
+    "neon-extension-source-netflix": "file:neon-extension-source-netflix-2.1.0.tgz",
+    "neon-extension-source-spotify": "file:neon-extension-source-spotify-2.1.0.tgz",
+    "neon-extension-source-youtubemusic": "file:neon-extension-source-youtubemusic-2.1.0.tgz"
   },
   "devDependencies": {
     "react": "^15.6.2"
