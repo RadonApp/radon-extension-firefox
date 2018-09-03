@@ -22,7 +22,7 @@ deploy:
   draft: true
   skip_cleanup: true
   api_key:
-    secure: AKZefc+oQWOuXAK7ytS2tFgEmenpGP8gHijYA8BZNqA4HhwWWYYFWAHaGVrVGgEcnHAJBAqee/smw2przpka12IqccyfhvSng0uhPU7HvWdqO/VDW38d+JmneExiCvn1Nw7N+xwoX65FRn/jDlsooUeAqk0rn5Gj6CBbzk6yf7o=
+    secure: A0pnsJ5UssDwtUibq4U67+N/7GeAHipomJ6alSEMG2d6TjqYnVFViKPgobN5gVpVG2fHFb3itrBl8KlII6Aijcw5WWKCJKeysL12zWs+BvUvB5zF2w6GmOENis3gLwrR2d9Ia8KRufITzLMH5/JCDtcgU2aPZSe9lZWeZvrjQps=
   file_glob: true
   file: Build/Production/Radon*.zip
   on:
@@ -31,7 +31,7 @@ deploy:
 - provider: bintray
   skip_cleanup: true
   key:
-    secure: VPZRZxfyFKRPTN70BSmud8du98gLe2k17yaMmHu31MbEsjbfVWLELmjL2367hLhNmUpgS5nP12kQAYLAaWkR65rUrDlxPTaHIO6wYTfXfC3auSSnGc0wBOmEBhRg/xIkXhbkLszbCADpsAnVHPdzPhSLC0MkLI4dNZKPJnqHqW8=
+    secure: bWn2di+zvWltGHYUfl2C4j50yMU7XNeoDGiSnYLmgu/7FxxWuW94ZVQ3vc2n0VCFd5B5HpjKn8nC4mK2inpWzz/5O7aRDnr/4VjYyOgaAMxGtteJbiMIoozgbUiZbhWMoCX2oeZg5kQ2LqUiz6PylpYtx5uWH0ZIkt3D2GNtOz4=
   file: Build/Production/bintray.json
   user: neapp-ci
   on:
