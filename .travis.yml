@@ -33,7 +33,7 @@ deploy:
   key:
     secure: bWn2di+zvWltGHYUfl2C4j50yMU7XNeoDGiSnYLmgu/7FxxWuW94ZVQ3vc2n0VCFd5B5HpjKn8nC4mK2inpWzz/5O7aRDnr/4VjYyOgaAMxGtteJbiMIoozgbUiZbhWMoCX2oeZg5kQ2LqUiz6PylpYtx5uWH0ZIkt3D2GNtOz4=
   file: Build/Production/bintray.json
-  user: neapp-ci
+  user: radon-ci
   on:
     repo: RadonApp/radon-extension-firefox
     all_branches: true
