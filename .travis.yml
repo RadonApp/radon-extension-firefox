@@ -19,6 +19,8 @@ after_success:
 - cat ./Build/Coverage/lcov.info | coveralls
 deploy:
 - provider: releases
+  tag_name: $TRAVIS_TAG
+  target_commitish: $TRAVIS_COMMIT
   draft: true
   skip_cleanup: true
   api_key:
