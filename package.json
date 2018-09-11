@@ -1,6 +1,6 @@
 {
   "name": "@radon-extension/firefox",
-  "version": "2.2.0-beta.1",
+  "version": "2.2.0-beta.2",
   "description": "Radon Extension for Firefox",
   "keywords": [
     "radon",
@@ -23,7 +23,7 @@
     "url": "https://github.com/RadonApp/radon-extension-firefox"
   },
   "dependencies": {
-    "@radon-extension/build": "file:radon-extension-build-2.2.0-beta.1.tgz",
+    "@radon-extension/build": "file:radon-extension-build-2.2.0-beta.2.tgz",
     "@radon-extension/core": "file:radon-extension-core-2.2.0-beta.1.tgz",
     "@radon-extension/plugin-lastfm": "file:radon-extension-plugin-lastfm-2.2.0-beta.1.tgz",
     "@radon-extension/plugin-librefm": "file:radon-extension-plugin-librefm-2.2.0-beta.1.tgz",
