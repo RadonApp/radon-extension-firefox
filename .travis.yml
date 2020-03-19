@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-- '7'
+- '11'
 before_install:
 - npm install -g npm@'^5.10.0'
 - npm install -g RadonApp/radon-extension-build#$TRAVIS_BRANCH || npm install -g RadonApp/radon-extension-build#develop
