@@ -1,6 +1,6 @@
 {
   "name": "@radon-extension/firefox",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "Radon Extension for Firefox",
   "keywords": [
     "radon",
@@ -23,18 +23,18 @@
     "url": "https://github.com/RadonApp/radon-extension-firefox"
   },
   "dependencies": {
-    "@radon-extension/build": "file:radon-extension-build-2.3.0.tgz",
-    "@radon-extension/core": "file:radon-extension-core-2.3.0.tgz",
-    "@radon-extension/framework": "file:radon-extension-framework-2.3.0.tgz",
-    "@radon-extension/plugin-amazonvideo": "file:radon-extension-plugin-amazonvideo-2.3.0.tgz",
-    "@radon-extension/plugin-googlemusic": "file:radon-extension-plugin-googlemusic-2.3.0.tgz",
-    "@radon-extension/plugin-lastfm": "file:radon-extension-plugin-lastfm-2.3.0.tgz",
-    "@radon-extension/plugin-librefm": "file:radon-extension-plugin-librefm-2.3.0.tgz",
-    "@radon-extension/plugin-listenbrainz": "file:radon-extension-plugin-listenbrainz-2.3.0.tgz",
-    "@radon-extension/plugin-netflix": "file:radon-extension-plugin-netflix-2.3.0.tgz",
-    "@radon-extension/plugin-spotify": "file:radon-extension-plugin-spotify-2.3.0.tgz",
-    "@radon-extension/plugin-trakt": "file:radon-extension-plugin-trakt-2.3.0.tgz",
-    "@radon-extension/plugin-youtubemusic": "file:radon-extension-plugin-youtubemusic-2.3.0.tgz"
+    "@radon-extension/build": "file:radon-extension-build-2.3.1.tgz",
+    "@radon-extension/core": "file:radon-extension-core-2.3.1.tgz",
+    "@radon-extension/framework": "file:radon-extension-framework-2.3.1.tgz",
+    "@radon-extension/plugin-amazonvideo": "file:radon-extension-plugin-amazonvideo-2.3.1.tgz",
+    "@radon-extension/plugin-googlemusic": "file:radon-extension-plugin-googlemusic-2.3.1.tgz",
+    "@radon-extension/plugin-lastfm": "file:radon-extension-plugin-lastfm-2.3.1.tgz",
+    "@radon-extension/plugin-librefm": "file:radon-extension-plugin-librefm-2.3.1.tgz",
+    "@radon-extension/plugin-listenbrainz": "file:radon-extension-plugin-listenbrainz-2.3.1.tgz",
+    "@radon-extension/plugin-netflix": "file:radon-extension-plugin-netflix-2.3.1.tgz",
+    "@radon-extension/plugin-spotify": "file:radon-extension-plugin-spotify-2.3.1.tgz",
+    "@radon-extension/plugin-trakt": "file:radon-extension-plugin-trakt-2.3.1.tgz",
+    "@radon-extension/plugin-youtubemusic": "file:radon-extension-plugin-youtubemusic-2.3.1.tgz"
   },
   "devDependencies": {
     "react": "^15.6.2"
